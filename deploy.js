@@ -35,6 +35,7 @@ pack.makePack(() => {
             return;
         }
         fs.writeFileSync(out, body);
+        console.log('加密的脚本文件 ' + out);
         //检查www路径的文件
         compressing.zip.compressDir(config.wwwpath+'/', config.wgtpath, {ignoreBase:true}).then(() => {
             console.log('  ' + config.wgtpath);;
