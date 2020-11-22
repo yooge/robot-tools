@@ -7,7 +7,7 @@ robot-tools init
 robot-tools deploy
 ```
 
-##3. 热更新
+## 3. 热更新
 ### 3.1 直接升级
 ```
 //1. 直接升级
