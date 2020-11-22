@@ -1,20 +1,20 @@
 ## 1. 更新apk   
-```
+```js
 robot-tools init
 ```
 ## 2. 发布项目   
-```
+```js
 robot-tools deploy
 ```
 
 ## 3. 热更新
 ### 3.1 直接升级
-```
+```js
 //1. 直接升级
 require('robot-tools').version.checkThenInstall();
 ```
 ### 3.2 检查，然后升级
-```
+```js
 const {version} = require('robot-tools');
 
 plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
