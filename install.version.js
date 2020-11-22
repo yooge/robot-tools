@@ -11,7 +11,7 @@ function checkThenInstall() {
 	// #endif
     plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
         curVersion = wgtinfo.version;
-        version.checkVersion((res) => {
+        checkVersion((res) => {
             console.log('new version: ' + res.version);
             if (curVersion != res.version) { //准备更新
                 // plus.nativeUI.confirm("是否安装更新？", function(e){
