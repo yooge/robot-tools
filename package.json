@@ -1,0 +1,19 @@
+{
+  "name": "robot-tools",
+  "version": "1.0.10",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "robot-tools": "./bin.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "_from": "robot-tools@1.0.4",
+  "_resolved": "https://registry.npm.taobao.org/robot-tools/download/robot-tools-1.0.4.tgz?cache=0&sync_timestamp=1605374585098&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frobot-tools%2Fdownload%2Frobot-tools-1.0.4.tgz",
+  "dependencies": {
+    "robot-tools": "^1.0.9"
+  }
+}

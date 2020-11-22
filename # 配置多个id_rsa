@@ -1,0 +1,31 @@
+# 配置多个id_rsa  
+
+# github
+
+Host yooge.github.com # Host是别名
+
+HostName github.com # HostName是远程仓库的域名
+
+IdentityFile ~/.ssh/id_rsa_yooge
+
+AddKeysToAgent yes
+
+# PreferredAuthentications publickey
+
+User 56222194@qq.com
+
+ 
+
+ 
+
+# 公司项目
+
+Host vnool.github.com
+
+HostName github.com
+
+IdentityFile ~/.ssh/id_rsa
+
+AddKeysToAgent yes
+
+User vnool@qq.com
