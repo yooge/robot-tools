@@ -14,13 +14,27 @@ function startDowload() {
 	    console.log(filename + '-----下载完毕');
 	});
 }
-try {
-	fs.accessSync('unpackage/debug', fs.constants.R_OK | fs.constants.W_OK);
+
+new Promise(res => {
+	fs.open('unpackage', 'r', (err) => {
+	  if (err) {
+		  fs.mkdirSync('unpackage');
+		  console.error('unpackage文件夹创建完成');
+		  res();
+	  };
+	  res();
+	});
+}).then(() => {
+	return new Promise(res => {
+		fs.open('unpackage/debug', 'r', (err) => {
+		  if (err) {
+			  fs.mkdirSync('unpackage/debug');
+			  console.error('debug文件夹创建完成');
+			  res()
+		  };
+		  res();
+		});
+	})
+}).then(() => {
 	startDowload();
-} catch (err) {
-	console.log('正在创键debug文件夹');
-	fs.mkdirSync('unpackage');
-	fs.mkdirSync('unpackage/debug');
-	console.log('创键完成debug文件夹');
-	startDowload();
-}
+})
