@@ -40,70 +40,88 @@ var ROBOT = {};
 })();; //
 /**
  * @param {Object} {
-	 * 	file: '相对static/robots/路径' || {uri: '本地下载绝对路径'}
-	 * }
+ *  file: '相对static/robots/路径' || {uri: '本地下载绝对路径'}
+ * }
  */
 ROBOT.start = function(obj) {
     var that = this;
-    console.log(obj.arguments);	
-    obj.arguments.__vue_keys = keys4back(obj.vue);
     // #ifndef APP-PLUS
     return; //非手机环境
     // #endif
-	var _entry = obj.file;
-	var dir = 'static/robots/';
-	if (typeof(obj.file) == 'string') {
-		if (_entry.endsWith('.js')) {
-		    _entry = _entry.substr(0, _entry.length - 3);
-		}
-		dir = plus.io.convertLocalFileSystemURL(dir);
-	} else {
-		var uri = plus.io.convertLocalFileSystemURL(obj.file.uri)
-		var pos = uri.lastIndexOf('/');
-		_entry = uri.substr(pos + 1);
-		dir = uri.substr(0, pos);
-	}
-	obj.arguments._entry = _entry;
-    this.robot.setJsDir(dir);
-    this.robot.setJsFile(typeof(obj.file) == 'string' ? 'index.js' : _entry);
-    this.robot.setJsArguments(JSON.stringify(obj.arguments));
-    this.robot.setJsCallback(function(data) {
-		var rlt = that.vueCallback(data);
-		that.robot.setVueValue(rlt);
-		return rlt;
-	});
-	this.robot.startMenu();
-	if (obj.startAtMenu == true) {
-		var nothing_; //not start
-	} else {
-		this.robot.start();
-	}
-	this.params = obj;
-	return this;
+    //准备脚本资源
+    this.prepareResorce(obj, (params) => {
+        that.params = params;
+        
+        console.log('readyCall ....');
+        // console.log( JSON.stringify(params));  请关闭 传入的vue对象后，再打印
+        //
+        that.robot.setJsDir(params.dir);
+        that.robot.setJsFile(params.file);
+        that.robot.setJsArguments(JSON.stringify(params.arguments));
+        that.robot.setJsCallback(function(data) {
+            var rlt = that.vueCallback(data);
+            that.robot.backVueData(rlt);
+            return rlt;
+        });
+        that.robot.startMenu();
+        if (params.startAtMenu == true) {
+            var nothing_; //not start
+        } else {
+            that.robot.start();
+        }
+        
+        return that;
+    })
+}
+//准备脚本资源
+ROBOT.prepareResorce = function(obj, readyCall) {
+    if (obj.arguments == undefined) {
+        obj.arguments = {};
+    }
+    if (obj.file == undefined) {
+        console.log('请设置机器人脚本');
+        return;
+    }
+
+    obj.arguments.__vue_keys = keys4back(obj.vue);
+    var jsfile = obj.file;
+    var dir;
+    if (jsfile.toLowerCase().startsWith('http')) { //----- 1.URL
+        this._downloadFile(obj, function(tmpjsfile) {
+            obj.dir = path.dirname(tmpjsfile);
+            obj.file = tmpjsfile;
+            readyCall(obj);
+        });
+    } else {
+        if (jsfile.startsWith('/')) { //----- 2. 绝对路径
+            var p = jsfile.lastIndexOf('/');
+            obj.dir = jsfile.substr(0, p);
+            //obj.file = tmpjsfile;  //还是执行自己
+        } else { //----- 3.相对路径
+            var _entry = jsfile;
+            if (jsfile.endsWith('.js')) {
+                _entry = _entry.substr(0, _entry.length - 3);
+            }
+            obj.dir = plus.io.convertLocalFileSystemURL('static/robots/');
+            obj.file = 'index.js';
+            obj.arguments._entry = _entry;
+        }
+        readyCall(obj);
+    }
 }
 /**
  * 直接使用远程链接启动脚本（无缓存模式）
  * @param {url：'远程链接'} obj 
  */
-ROBOT.startUrl = function(obj) {
-	uni.downloadFile({
-		url: obj.url,
-		success: (res) => {
-			if (res.statusCode === 200) {
-				robot.stop();
-				var param = {
-					file: {
-						uri: res.tempFilePath
-					},
-					arguments: obj.arguments  || {},
-					onMessage: function(js) {
-						if (obj.onMessage != undefined) obj.onMessage(js)
-					}
-				}
-				ROBOT.start(param)
-			}
-		}
-	});
+ROBOT._downloadFile = function(obj, callback) {
+    uni.downloadFile({
+        url: obj.file,
+        success: (res) => {
+            if (res.statusCode === 200) {
+                callback(res.tempFilePath);
+            }
+        }
+    });
 }
 ROBOT.showMenu = function(obj) {
     obj.startAtMenu = true; //只显示菜单，不执行
@@ -143,7 +161,12 @@ String.prototype.replaceAll = function(s1, s2) {
 ROBOT.vueCallback = function(data) {
     //console.log(JSON.stringify(data));
     var obj = this.params;
-    var js = JSON.parse(data);
+    var js;
+    try {
+        js = JSON.parse(data);
+    } catch (e) {
+        return;
+    }
     var error = js.error;
     if (error != undefined && error.indexOf('permission') > -1) {
         //---that.permission();
