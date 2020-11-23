@@ -66,24 +66,18 @@ ROBOT.start = function(obj) {
     this.robot.setJsFile(typeof(obj.file) == 'string' ? 'index.js' : _entry);
     this.robot.setJsArguments(JSON.stringify(obj.arguments));
     this.robot.setJsCallback(function(data) {
-        console.log(data);
-        var js = JSON.parse(data);
-        var error = js.error;
-        if (error != undefined && error.indexOf('permission') > -1) {
-            //---that.permission();
-            js.status = "error"
-            //data = JSON.stringify(js)
-            return;
-        }
-        if (obj.onMessage != undefined) obj.onMessage(js)
-    });
-    this.robot.startMenu();
-    if (obj.startAtMenu == true) {
-        var nothing_; //not start
-    } else {
-        this.robot.start();
-    }
-    return this;
+		var rlt = that.vueCallback(data);
+		that.robot.setVueValue(rlt);
+		return rlt;
+	});
+	this.robot.startMenu();
+	if (obj.startAtMenu == true) {
+		var nothing_; //not start
+	} else {
+		this.robot.start();
+	}
+	this.params = obj;
+	return this;
 }
 /**
  * 直接使用远程链接启动脚本（无缓存模式）
