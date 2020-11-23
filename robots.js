@@ -44,7 +44,9 @@ var ROBOT = {};
 	 * }
  */
 ROBOT.start = function(obj) {
-    console.log(obj);
+    var that = this;
+    console.log(obj.arguments);	
+    obj.arguments.__vue_keys = keys4back(obj.vue);
     // #ifndef APP-PLUS
     return; //非手机环境
     // #endif
