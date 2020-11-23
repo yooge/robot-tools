@@ -38,38 +38,72 @@ var ROBOT = {};
         stop: () => {},
     };
 })();; //
+/**
+ * @param {Object} {
+	 * 	file: '相对static/robots/路径' || {uri: '本地下载绝对路径'}
+	 * }
+ */
 ROBOT.start = function(obj) {
     var that = this;
-    console.log(obj.arguments);
+    console.log(obj.arguments);	
     obj.arguments.__vue_keys = keys4back(obj.vue);
     // #ifndef APP-PLUS
     return; //非手机环境
     // #endif
-    var _entry = obj.file;
-    if (_entry.endsWith('.js')) {
-        _entry = _entry.substr(0, _entry.length - 3);
-    }
-    obj.arguments._entry = _entry;
-    var dir = 'static/robots/';
-    if (!dir.startsWith('/')) { //非绝对路径，
-        dir = plus.io.convertLocalFileSystemURL(dir);
-    }
+	var _entry = obj.file;
+	var dir = 'static/robots/';
+	if (typeof(obj.file) == 'string') {
+		if (_entry.endsWith('.js')) {
+		    _entry = _entry.substr(0, _entry.length - 3);
+		}
+		dir = plus.io.convertLocalFileSystemURL(dir);
+	} else {
+		var uri = plus.io.convertLocalFileSystemURL(obj.file.uri)
+		var pos = uri.lastIndexOf('/');
+		_entry = uri.substr(pos + 1);
+		dir = uri.substr(0, pos);
+	}
+	obj.arguments._entry = _entry;
     this.robot.setJsDir(dir);
-    this.robot.setJsFile('index.js');
+    this.robot.setJsFile(typeof(obj.file) == 'string' ? 'index.js' : _entry);
     this.robot.setJsArguments(JSON.stringify(obj.arguments));
     this.robot.setJsCallback(function(data) {
-        var rlt = that.vueCallback(data);
-        that.robot.setVueValue(rlt);
-        return rlt;
-    });
-    this.robot.startMenu();
-    if (obj.startAtMenu == true) {
-        var nothing_; //not start
-    } else {
-        this.robot.start();
-    }
-    this.params = obj;
-    return this;
+		var rlt = that.vueCallback(data);
+		that.robot.setVueValue(rlt);
+		return rlt;
+	});
+	this.robot.startMenu();
+	if (obj.startAtMenu == true) {
+		var nothing_; //not start
+	} else {
+		this.robot.start();
+	}
+	this.params = obj;
+	return this;
+}
+/**
+ * 直接使用远程链接启动脚本（无缓存模式）
+ * @param {url：'远程链接'} obj 
+ */
+ROBOT.startUrl = function(obj) {
+	uni.downloadFile({
+		url: obj.url,
+		success: (res) => {
+			if (res.statusCode === 200) {
+				robot.stop();
+				var param = {
+					file: {
+						uri: res.tempFilePath
+					},
+					arguments: obj.arguments  || {},
+					onMessage: function(js) {
+						if (obj.onMessage != undefined) obj.onMessage(js)
+					}
+				}
+				ROBOT.start(param)
+			}
+		}
+	});
 }
 ROBOT.showMenu = function(obj) {
     obj.startAtMenu = true; //只显示菜单，不执行
