@@ -2,12 +2,12 @@
   *** 用法 ****
 var robot = require('@/robots/robots.js');
 
-//  
+//
 param = { dir, file, arguments  onMessage:(){}, menuOnly}
 
- 
+
 //强制停止机器人
-robot.start(param); 
+robot.start(param);
 robot.showMenu();
 robot.stop();
 robot.exec(function(){...});
@@ -17,7 +17,7 @@ var ROBOT = {};
 (function() {
     // #ifndef APP-PLUS
     return;
-    //#endif 
+    //#endif
     var robot;
     robot = global.robot = uni.requireNativePlugin('Robot');
     robot.init(plus.runtime.appid, (msg) => {
@@ -37,10 +37,20 @@ var ROBOT = {};
         start: () => {},
         stop: () => {},
     };
-})();; //
+})(); //
+
+// 远程url执行脚本缓存类型
+ROBOT.HttpCacheType = {
+  NONE: 0,				// 无缓存
+  GENERAL: 1,				// 有缓存（只储存不强制执行缓存，每次还是会下载）
+  COMPEL: 2				// 有缓存（如果发现缓存强制执行缓存不进行下载）
+}
+
 /**
  * @param {Object} {
- *  file: '相对static/robots/路径' || {uri: '本地下载绝对路径'}
+ *  file: String,   					// 文件地址
+ * 	httpCacheType?: HttpCacheType,		// 缓存类型
+ * 	onCacheFile?: () => string			// 缓存地址回调
  * }
  */
 ROBOT.start = function(obj) {
@@ -78,6 +88,10 @@ ROBOT.prepareResorce = function(obj, readyCall) {
     if (obj.arguments == undefined) {
         obj.arguments = {};
     }
+    // 默认为无缓存模式
+    if (obj.httpCacheType == undefined) {
+      obj.httpCacheType = this.HttpCacheType.NONE;
+    }
     if (obj.file == undefined) {
         console.log('请设置机器人脚本');
         return;
@@ -87,11 +101,13 @@ ROBOT.prepareResorce = function(obj, readyCall) {
     var jsfile = obj.file;
     var dir;
     if (jsfile.toLowerCase().startsWith('http')) { //----- 1.URL
-        this._downloadFile(obj, function(tmpjsfile) {
-            obj.dir = path.dirname(tmpjsfile);
-            obj.file = tmpjsfile;
-            readyCall(obj);
-        });
+      this.disposeHttpFile(obj).then(file => {
+        const localFile = plus.io.convertLocalFileSystemURL(file);
+        var pos = localFile.lastIndexOf('/');
+        obj.dir = localFile.substr(0, pos);
+        obj.file = localFile.substr(pos + 1);
+        readyCall(obj);
+      })
     } else {
         if (jsfile.startsWith('/')) { //----- 2. 绝对路径
             var p = jsfile.lastIndexOf('/');
@@ -109,9 +125,57 @@ ROBOT.prepareResorce = function(obj, readyCall) {
         readyCall(obj);
     }
 }
+
+// 处理http地址
+ROBOT.disposeHttpFile = function(obj) {
+  // 下载文件并储存
+  const downloadFileAndSave = () => {
+    return new Promise(res => {
+      this._downloadFile(obj, (tmpjsfile) => {
+        switch(obj.httpCacheType) {
+          case this.HttpCacheType.NONE:
+            res(tmpjsfile);
+            break;
+          case this.HttpCacheType.GENERAL:
+          case this.HttpCacheType.COMPEL:
+            uni.saveFile({
+              tempFilePath: tmpjsfile,
+              success: (r) => {
+                uni.setStorageSync(obj.file, r.savedFilePath);
+                if (obj.onCacheFile != undefined) {
+                  obj.onCacheFile(r.savedFilePath);
+                }
+                res(r.savedFilePath);
+              }
+            })
+            break;
+        }
+      })
+    })
+  }
+  // 1，强制缓存模式先读取缓存，无缓存再进行下载
+  return new Promise(res => {
+    if (obj.httpCacheType === this.HttpCacheType.COMPEL) {
+      const cacheFile = uni.getStorageSync(obj.file);
+      // 2，判断是否有缓存，无缓存下载有缓存使用
+      if (cacheFile) {
+        res(cacheFile)
+      } else {
+        downloadFileAndSave().then((file) => {
+          res(file)
+        })
+      }
+    } else {
+      downloadFileAndSave().then((file) => {
+        res(file)
+      })
+    }
+  })
+}
+
 /**
  * 直接使用远程链接启动脚本（无缓存模式）
- * @param {url：'远程链接'} obj 
+ * @param {url：'远程链接'} obj
  */
 ROBOT._downloadFile = function(obj, callback) {
     uni.downloadFile({
