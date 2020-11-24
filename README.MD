@@ -37,11 +37,6 @@ plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
 ```js
 robot.start(startOption);
 ```
-
-| 左对齐 | 右对齐 | 居中对齐 |
-| :-----| ----: | :----: |
-| 单元格 | 单元格 | 单元格 |
-| 单元格 | 单元格 | 单元格 |
 #### 4.1 startOption
 | 属性| 类型 | 是否必须 | 描述 |
 | :-----| :----- | :----- | :----- |
