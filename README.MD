@@ -42,8 +42,9 @@ robot.start(startOption);
 | :-----| :----- | :----- | :----- |
 | file | string | 是 | 脚本文件路径文件路径 |
 | httpCacheType | HttpCacheType | 否 | 远程url执行脚本缓存类型 |
-| onCacheFile | () => string | 否 | 缓存地址回调 |
 | arguments | {} | 否 | json,传递给机器人的参数 |
+| header | Object | 否 | HTTP 请求 Header, header |
+| onCacheFile | () => string | 否 | 缓存地址回调 |
 | onMessage | () => any | 否 | 回调函数，机器人给VUE发送消息 |
 #### 4.1.1 HttpCacheType类
 ```js
