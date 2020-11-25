@@ -22,7 +22,7 @@ var path = require('path');
 eval('global.manifest = ' + fs.readFileSync('./manifest.json', 'utf-8'));
 var appid = manifest.appid;
 var version = manifest.versionName;
-var entry = path.resolve('./static/robots/index.js');
+var entry = path.resolve('./static/robots/_entry.js');
 //entry = path.resolve('./static/robots/index.js');
 //entry = path.resolve('./static/test-pack/index.js');
 
@@ -39,7 +39,7 @@ module.exports = {
 	server,
 	publicKey,
 	entry,
-	outfile: 'index.js',
+	outfile: '_entry.js',
 	outpath,
 	workpath,
 	wwwpath: workpath + '/www',

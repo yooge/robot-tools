@@ -1,20 +1,3 @@
-function keys4back(obj) {
-    var list = {};
-    for (var key in obj) {
-        var type = typeof(obj[key]);
-        if (type == 'object') {
-            // expode(obj[k], tab+"  ");
-        }
-        if (!key.startsWith("_") && !key.startsWith("$")) {
-            if (type == 'function') {
-                list[key] = type;
-            } else {
-                list[key] = type;
-            }
-        }
-    }
-    return list;
-}
 
 const pathAnalysis = {
 	// 远程url执行脚本缓存类型
@@ -38,7 +21,7 @@ const pathAnalysis = {
 	        return;
 	    }
 	
-	    obj.arguments.__vue_keys = keys4back(obj.vue);
+	    
 	    var jsfile = obj.file;
 	    var dir;
 	    if (jsfile.toLowerCase().startsWith('http')) { //----- 1.URL
@@ -60,7 +43,7 @@ const pathAnalysis = {
 	                _entry = _entry.substr(0, _entry.length - 3);
 	            }
 	            obj.dir = plus.io.convertLocalFileSystemURL('static/robots/');
-	            obj.file = 'index.js';
+	            obj.file = '_entry.js';
 	            obj.arguments._entry = _entry;
 	        }
 	        readyCall(obj);

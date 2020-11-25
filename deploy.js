@@ -17,11 +17,8 @@ console.log('1. 压缩...');
 pack.makePack(() => {
     var out = config.outpath + '/' + config.outfile;
     var content = fs.readFileSync(out);
-    //content = RSA.encode(content);
-    // var logo = fs.readFileSync(path.resolve('kits/logo.png'));
-    // fs.writeFileSync(out + '.png', logo +"\n\n"+ content);
-    //fs.writeFileSync(out, '/*hello*/'+content);
-    //console.log(out);;
+    //content = RSA.encode(content); 
+    
     console.log('2. 加密...');
     request.post({
         url: config.server + '/app-license/robot-code-pack2.php',

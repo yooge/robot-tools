@@ -1,6 +1,6 @@
 /*
   *** 用法 ****
-var robot = require('@/robots/robots.js');
+var robot = require('robots.js');
 
 //
 param = { dir, file, arguments  onMessage:(){}, menuOnly}
@@ -40,13 +40,12 @@ var ROBOT = {};
     };
     Object.assign(ROBOT, pathAnalysis);
 })(); //
-
 /**
  * @param {Object} {
- *  file: String,   					        // 文件地址
- * 	httpCacheType?: HttpCacheType,		// 缓存类型
- * 	header: Object,						        // HTTP 请求 Header, header
- * 	onCacheFile?: () => string			  // 缓存地址回调
+ *  file: String,                               // 文件地址
+ *  httpCacheType?: HttpCacheType,      // 缓存类型
+ *  header: Object,                             // HTTP 请求 Header, header
+ *  onCacheFile?: () => string            // 缓存地址回调
  * }
  */
 ROBOT.start = function(obj) {
@@ -56,11 +55,8 @@ ROBOT.start = function(obj) {
     // #endif
     //准备脚本资源
     this.prepareResorce(obj, (params) => {
+        params.arguments.__vue_keys = keys4back(params.vue);
         that.params = params;
-        
-        console.log('readyCall ....');
-        // console.log( JSON.stringify(params));  请关闭 传入的vue对象后，再打印
-        //
         that.robot.setJsDir(params.dir);
         that.robot.setJsFile(params.file);
         that.robot.setJsArguments(JSON.stringify(params.arguments));
@@ -75,11 +71,9 @@ ROBOT.start = function(obj) {
         } else {
             that.robot.start();
         }
-        
         return that;
     })
 }
-
 ROBOT.showMenu = function(obj) {
     obj.startAtMenu = true; //只显示菜单，不执行
     obj.arguments.startAtMenu = true;
@@ -114,6 +108,24 @@ ROBOT.stop = function() {
 }
 String.prototype.replaceAll = function(s1, s2) {
     return this.replace(new RegExp(s1, "gm"), s2);
+}
+
+function keys4back(obj) {
+    var list = {};
+    for (var key in obj) {
+        var type = typeof(obj[key]);
+        if (type == 'object') {
+            // expode(obj[k], tab+"  ");
+        }
+        if (!key.startsWith("_") && !key.startsWith("$")) {
+            if (type == 'function') {
+                list[key] = type;
+            } else {
+                list[key] = type;
+            }
+        }
+    }
+    return list;
 }
 ROBOT.vueCallback = function(data) {
     //console.log(JSON.stringify(data));
