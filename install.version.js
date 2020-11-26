@@ -9,9 +9,14 @@ function checkThenInstall() {
 	// #ifndef APP-PLUS
 	return; //非手机环境
 	// #endif
+
     plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
+        //console.log(wgtinfo);
+
         curVersion = wgtinfo.version;
-        checkVersion((res) => {
+        var channel = manifest().id; //????
+
+        checkVersion(channel, (res) => {
             console.log('new version: ' + res.version);
             if (curVersion != res.version) { //准备更新
                 // plus.nativeUI.confirm("是否安装更新？", function(e){
@@ -26,8 +31,12 @@ function checkThenInstall() {
     });
 }
 //检查版本
-function checkVersion(callback) {
-    return checkInfo((res) => {
+function checkVersion(channel, callback) {
+    if(channel==undefined){
+        console.log('channel is not set')
+        return false;
+    }
+    return checkInfo(channel, (res) => {
         console.log(res);
         if (res.err != undefined) {
             console.log(res.err);
@@ -62,8 +71,8 @@ function do_install(callback) {
             uni.setStorageSync('version', download_ver);
             // alert(status);
             //plus.runtime.restart();
-            plus.nativeUI.alert("升级完成，重启!", function() {
-                plus.runtime.restart();
+            plus.nativeUI.alert("升级完成，请重启!", function() {
+                plus.runtime.quit();
             });
         } else {
             uni.showToast({
@@ -76,9 +85,10 @@ function do_install(callback) {
     });
 }
 
-function checkInfo(callback) {
-    var url = version_manager_install + "app=" + plus.runtime.appid;;
-    //console.log(url);
+function checkInfo(channel, callback) {
+
+    var url = version_manager_install + "app=" + channel;;
+    console.log(url);
     uni.request({
         url: url,
         type: 'GET',
@@ -91,8 +101,25 @@ function checkInfo(callback) {
         }
     })
 };
+
+function manifest(){
+    // #ifndef APP-PLUS
+    return; //非手机环境
+    // #endif
+    
+    //var jsbuf = files.readAssets('apps/__UNI__9D97713/www/manifest.json');
+    var robot = uni.requireNativePlugin('Robot');
+    var jsbuf = robot.resource('manifest.json', "ISO_8859_1");
+    console.log('jsbuf');
+    console.log(jsbuf);
+    var manifest = JSON.parse(jsbuf);
+    return manifest;
+
+    
+}
 module.exports = {
     checkVersion,
     install,
-    checkThenInstall
+    checkThenInstall,
+    manifest: manifest()
 }

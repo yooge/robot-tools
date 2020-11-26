@@ -4,47 +4,70 @@ var pack = require('./pack.js');
 var path = require('path');
 const compressing = require('compressing');
 var config = require('./config.js');
-//const RSA = require('./rsa.js');
-if (!fs.existsSync(config.wwwpath + "/manifest.json")) {
+var apkmaker = require('./apkMaker.js');
 
-   console.log('\u001b[31m[失败]\u001b[0m 请执行菜单: 发行/本地打包/生成本地app资源');
-   return;
-}
-//删除out目录的js文件
-delDir(config.outpath);
-console.log('1. 压缩...');
-//打包
-pack.makePack(() => {
-    var out = config.outpath + '/' + config.outfile;
-    var content = fs.readFileSync(out);
-    //content = RSA.encode(content); 
-    
-    console.log('2. 加密...');
-    request.post({
-        url: config.server + '/app-license/robot-code-pack2.php',
-        form: {
-            "manifest": JSON.stringify(config.manifest),
-            "data": content
-        }
-    }, function(error, response, body) {
-        if (error || response.statusCode != 200) {
-            console.log(error.code);
-            return;
-        }
-        fs.writeFileSync(out, body);
-        console.log('加密的脚本文件 ' + out);
-        //检查www路径的文件
-        compressing.zip.compressDir(config.wwwpath+'/', config.wgtpath, {ignoreBase:true}).then(() => {
-            console.log('  ' + config.wgtpath);;
-            uploadPack(config.wgtpath);
-        }).catch(err => {
-            console.error(err);
+function start() {
+    //const RSA = require('./rsa.js');
+    if (!fs.existsSync(config.wwwpath + "/manifest.json")) {
+        console.log('\u001b[31m[失败]\u001b[0m 请执行菜单: 发行/本地打包/生成本地app资源');
+        return;
+    }
+    encode(() => {
+        //1. 压缩上传热更新补丁
+        console.log('3. 更新/升级热补丁 ...');
+        packUpload(() => {
+            //2. 生成本地正式版APK 
+            console.log('4. 生成本地正式版APK （12月15日上线, 此前的请在QQ群:1037025652 索取）');
+            //apkmaker.make();
+            //;; 
         });
-    })
-});
+        //
+    });
+}
+// 压缩上传热更新补丁
+function packUpload(donecall) {
+    compressing.zip.compressDir(config.wwwpath + '/', config.wgtpath, {
+        ignoreBase: true
+    }).then(() => {
+        console.log('  ' + config.wgtpath);;
+        //上传
+        uploadPack(config.wgtpath, donecall);
+    }).catch(err => {
+        console.error(err);
+    });
+}
 
-function uploadPack(wgtpath) {
-    console.log('3. 更新/升级...');
+function encode(callback) {
+    //删除out目录的js文件
+    delDir(config.outpath);
+    //打包
+    console.log('1. 压缩...');
+    pack.makePack(() => {
+        var out = config.outpath + '/' + config.outfile;
+
+        var content = fs.readFileSync(out);
+        //content = RSA.encode(content); 
+        console.log('2. 加密...');
+        request.post({
+            url: config.server + '/app-license/robot-code-pack2.php',
+            form: {
+                "manifest": JSON.stringify(config.manifest),
+                "data": content
+            }
+        }, function(error, response, body) {
+            if (error || response.statusCode != 200) {
+                console.log(error.code);
+                return;
+            }
+            fs.writeFileSync(out, body);
+            console.log('   加密的脚本文件 ' + out);
+            ////
+            callback();
+        })
+    });
+}
+//console.log('3. 更新/升级热补丁 ...');
+function uploadPack(wgtpath, donecall) {
     var formData = {
         "manifest": JSON.stringify(config.manifest),
         "file": fs.createReadStream(wgtpath),
@@ -53,8 +76,9 @@ function uploadPack(wgtpath) {
         url: config.server + '/app-store/upload.php',
         formData: formData
     }, function(error, response, body) {
-        console.log(body);
+        //console.log(body);
         console.log(' \u001b[32m [完成]!!\u001b[0m ');
+        donecall();
     })
 }
 
@@ -79,3 +103,5 @@ function delDir(path) {
         }
     }
 }
+//start();
+module.exports = start;

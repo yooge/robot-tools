@@ -31,7 +31,8 @@ var outpath = path.resolve('unpackage/resources/' + appid + '/www/static/robots/
 
 var workpath = path.resolve('unpackage/resources/' + appid);
 
-var wgtpath = path.resolve('unpackage/resources/' + appid + '.' + version + '.encrypt.wgt');
+//var wgtpath = path.resolve('unpackage/resources/' + appid + '.' + version + '.encrypt.wgt');
+var wgtpath = path.resolve('unpackage/resources/' + version + '.encrypt.wgt');
 
 var apkpath = path.resolve('unpackage/debug/android_debug.apk' );
 

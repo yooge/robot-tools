@@ -3,8 +3,10 @@
 var argv = process.argv;
  
 if(argv[2]=='deploy'){
-  require('./deploy.js');
+  var deploy = require('./deploy.js');
+  deploy();
 }
 if(argv[2]=='init'){
-  require('./install_apk.js');
+  var install = require('./install_apk.js');
+  install();
 }

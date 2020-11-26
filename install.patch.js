@@ -1,6 +1,6 @@
 const VERSION = "07504484b50";;
 
-import Request from './request.js'
+const {Request} = './request.js'
 var utils = require('./install.utils.js');
 const APP_NAME = 'robot-center-script';
 const version_manager_url = "http://robots.vnool.com:81/app-store/patch.php?";
