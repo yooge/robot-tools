@@ -1,8 +1,12 @@
 /*
 app, token  用来通知服务器对代码加密的，
 */
+
+//加密服务器地址
 var  server = "http://robots.vnool.com:81";
 
+//热更新服务器地址， 你可以替换为你自己的服务器，并上传upload.php 到你的服务器。
+var  hotpatch_server = server;
 
 
 var publicKey =
@@ -38,6 +42,7 @@ var apkpath = path.resolve('unpackage/debug/android_debug.apk' );
 
 module.exports = {
 	server,
+	hotpatch_server,
 	publicKey,
 	entry,
 	outfile: '_entry.js',

@@ -1,3 +1,12 @@
+/*
+
+压缩，加密代码，发布热更新，生成安卓apk包
+
+如果想用你自己的热更新服务器，请修改config.js文件里面的 
+hotpatch_server 变量为你自己的服务器地址。
+
+*/
+
 var fs = require('fs');
 var request = require('request');
 var pack = require('./pack.js');
@@ -17,7 +26,8 @@ function start() {
         console.log('3. 更新/升级热补丁 ...');
         packUpload(() => {
             //2. 生成本地正式版APK 
-            console.log('4. 生成本地正式版APK （12月15日上线, 此前的请在QQ群:1037025652 索取）');
+            console.log('4.\u001b[31m 本地生成正式版APK （12月15日上线, 此前请找群主索取，QQ群: 1037025652）\u001b[0m ');
+            console.log('');
             //apkmaker.make();
             //;; 
         });
@@ -60,7 +70,7 @@ function encode(callback) {
                 return;
             }
             fs.writeFileSync(out, body);
-            console.log('   加密的脚本文件 ' + out);
+            console.log('   加密后的脚本文件: ' + out);
             ////
             callback();
         })
@@ -73,11 +83,12 @@ function uploadPack(wgtpath, donecall) {
         "file": fs.createReadStream(wgtpath),
     };
     request.post({
-        url: config.server + '/app-store/upload.php',
+        url: config.hotpatch_server + '/app-store/upload.php',
         formData: formData
     }, function(error, response, body) {
         //console.log(body);
-        console.log(' \u001b[32m [完成]!!\u001b[0m ');
+        console.log(' \u001b[32m  [已上传到热更新服务器]!!\u001b[0m ');
+        //console.log(' \u001b[32m [完成]!!\u001b[0m ');
         donecall();
     })
 }
