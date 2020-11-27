@@ -6,7 +6,7 @@ function downloadFile(uri, filename, callback) {
     var stream = fs.createWriteStream(filename);
     request(uri).pipe(stream).on('close', callback);
 }
-var fileUrl = config.server + '/app-store/robot.apk';
+var fileUrl = config.server + '/app-store/app-release.apk';
 var filename = config.apkpath; //文件名
 function startDowload() {
     console.log(filename + '-----正在下载');

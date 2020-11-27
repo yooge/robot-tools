@@ -106,12 +106,12 @@ function manifest(){
     // #ifndef APP-PLUS
     return; //非手机环境
     // #endif
-    
+
     //var jsbuf = files.readAssets('apps/__UNI__9D97713/www/manifest.json');
     var robot = uni.requireNativePlugin('Robot');
-    var jsbuf = robot.resource('manifest.json', "ISO_8859_1");
-    console.log('jsbuf');
-    console.log(jsbuf);
+    var jsbuf = robot.resource('manifest.json', "utf-8");
+    //console.log('jsbuf');
+    //console.log(jsbuf);
     var manifest = JSON.parse(jsbuf);
     return manifest;
 
