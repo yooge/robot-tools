@@ -3,9 +3,17 @@
 robot-tools init
 ```
 ## 2. 发布项目   
+默认使用本项目的热更新服务器
 ```js
 robot-tools deploy
 ```
+
+#### 2.2 自定义热更新服务器
+```js 
+robot-tools deploy  http://abc.com/
+```
+请上传upload.php 到你的服务器位置 http://abc.com/app-store/upload.php
+
 
 ## 3. 热更新
 ### 3.1 直接升级

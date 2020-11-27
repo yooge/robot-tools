@@ -43,6 +43,7 @@ var apkpath = path.resolve('unpackage/debug/android_debug.apk' );
 module.exports = {
 	server,
 	hotpatch_server,
+	hotpatch_diy:false,
 	publicKey,
 	entry,
 	outfile: '_entry.js',

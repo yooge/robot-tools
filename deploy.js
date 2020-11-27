@@ -6,7 +6,6 @@
 hotpatch_server 变量为你自己的服务器地址。
 
 */
-
 var fs = require('fs');
 var request = require('request');
 var pack = require('./pack.js');
@@ -15,7 +14,11 @@ const compressing = require('compressing');
 var config = require('./config.js');
 var apkmaker = require('./apkMaker.js');
 
-function start() {
+function start(hotpatch_server) {
+    if (hotpatch_server != undefined) {
+        config.hotpatch_server = hotpatch_server;
+        config.hotpatch_diy = true;
+    }
     //const RSA = require('./rsa.js');
     if (!fs.existsSync(config.wwwpath + "/manifest.json")) {
         console.log('\u001b[31m[失败]\u001b[0m 请执行菜单: 发行/本地打包/生成本地app资源');
@@ -54,7 +57,6 @@ function encode(callback) {
     console.log('1. 压缩...');
     pack.makePack(() => {
         var out = config.outpath + '/' + config.outfile;
-
         var content = fs.readFileSync(out);
         //content = RSA.encode(content); 
         console.log('2. 加密...');
@@ -78,16 +80,27 @@ function encode(callback) {
 }
 //console.log('3. 更新/升级热补丁 ...');
 function uploadPack(wgtpath, donecall) {
+    var upload_server = config.hotpatch_server + '/app-store/upload.php';
+    if (config.hotpatch_diy) {
+        console.log('上传热更新到：' + upload_server);
+    }
     var formData = {
         "manifest": JSON.stringify(config.manifest),
         "file": fs.createReadStream(wgtpath),
     };
     request.post({
-        url: config.hotpatch_server + '/app-store/upload.php',
+        url: upload_server,
         formData: formData
     }, function(error, response, body) {
-        //console.log(body);
-        console.log(' \u001b[32m  [已上传到热更新服务器]!!\u001b[0m ');
+        if (!body || body.indexOf('UPLOAD_OK') < 1) {
+            console.log(error);
+            console.log(body);
+            console.log('\u001b[31m[失败]\u001b[0m 上传热更新到服务器出现错误！！！\n');
+        } else {
+            console.log(' \u001b[32m  [已上传到热更新服务器]!!\u001b[0m ');
+
+        }
+        
         //console.log(' \u001b[32m [完成]!!\u001b[0m ');
         donecall();
     })

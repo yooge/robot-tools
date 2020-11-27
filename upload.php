@@ -10,7 +10,13 @@ if(!$manifest){
 }
 $manifest = json_decode(  $manifest , true);
 $app = $manifest['appid'];  
-
+//
+if(strpos($app,'/') ===FALSE  || strpos($app,'\\') ===FALSE 
+	|| strpos($app, '\0') ===FALSE || strpos($app, '.') ===FALSE ){
+   ;//nothing
+}else{
+	exit("appid $app : 不合格!!");
+}
 
 move_uploaded_file($_FILES["file"]["tmp_name"], "data/" . $app . '.wgt');
 
@@ -21,3 +27,5 @@ $version = [
     "path"=>$app . '.wgt'
 ];
 file_put_contents("data/" . $app . '.json',  json_encode($version));
+
+echo "__UPLOAD_OK";
