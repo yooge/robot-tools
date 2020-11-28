@@ -3,7 +3,7 @@
 var robot = require('robots.js');
 
 //
-param = { dir, file, arguments  onMessage:(){}, menuOnly}
+param = { vue: this, file:'a.js', arguments , onMessage:(){}}
 
 
 //强制停止机器人
@@ -28,7 +28,7 @@ var ROBOT = {};
         }
         uni.showModal({
             title: '提示',
-            content: 'App认证失败',
+            content: 'Appid未设置',
         });
     });
     ROBOT = {
@@ -53,9 +53,15 @@ ROBOT.start = function(obj) {
     // #ifndef APP-PLUS
     return; //非手机环境
     // #endif
+
+    if (obj.arguments == undefined && obj.vue) {
+        obj.arguments = obj.vue.$data;
+    }
+
     //准备脚本资源
     this.prepareResorce(obj, (params) => {
         params.arguments.__vue_keys = keys4back(params.vue);
+
         that.params = params;
         that.robot.setJsDir(params.dir);
         that.robot.setJsFile(params.file);
@@ -66,8 +72,9 @@ ROBOT.start = function(obj) {
             return rlt;
         });
         that.robot.startMenu();
-        if (params.startAtMenu == true) {
+        if (params._startAtMenu == true) {
             var nothing_; //not start
+            that.permission(); //检查权限，让悬浮窗出来
         } else {
             that.robot.start();
         }
@@ -75,8 +82,11 @@ ROBOT.start = function(obj) {
     })
 }
 ROBOT.showMenu = function(obj) {
-    obj.startAtMenu = true; //只显示菜单，不执行
-    obj.arguments.startAtMenu = true;
+    if (obj.arguments == undefined && obj.vue) {
+        obj.arguments = obj.vue.$data; //改成复制比较好
+    }
+    obj._startAtMenu = true; //只显示菜单，不执行
+    obj.arguments._startAtMenu = true;
     this.start(obj);
     uni.showToast({
         icon: 'none',
@@ -110,7 +120,23 @@ String.prototype.replaceAll = function(s1, s2) {
     return this.replace(new RegExp(s1, "gm"), s2);
 }
 
-function keys4back(obj) {
+function keys4back(vue) {
+    if (vue == undefined) return {};
+    if (vue.$options == undefined) {
+        console.log('robot参数：不再支持传递普通对象, 当前仅支持传递vue的this');
+        return {};
+    }
+    var list = {};
+    for (var w in vue.$options.methods) {
+        list[w] = 'function';
+    }
+    for (var w in vue.$data) {
+        list[w] = typeof(vue.$data[w]);
+    }
+    return list;
+}
+
+function keys4back___old(obj) {
     var list = {};
     for (var key in obj) {
         var type = typeof(obj[key]);
