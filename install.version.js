@@ -15,6 +15,10 @@ function checkThenInstall() {
 
         curVersion = wgtinfo.version;
         var channel = manifest().id; //????
+        
+        uni.showLoading({
+            title: '加载中...'
+        });
 
         checkVersion(channel, (res) => {
             console.log('new version: ' + res.version);
