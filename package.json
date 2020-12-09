@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "single-line-log": "^1.1.2"
+    "compressing": "^1.5.1",
+    "request": "^2.88.2",
+    "webpack": "^5.4.0"
   }
 }
