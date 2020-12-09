@@ -1,6 +1,7 @@
 var request = require('request');
 var fs = require('fs');
 var config = require('./config.js');
+ var utils = require('./utils.js');
 
 function downloadFile(uri, filename, callback) {
     var stream = fs.createWriteStream(filename);
@@ -9,9 +10,16 @@ function downloadFile(uri, filename, callback) {
 var fileUrl = config.server + '/app-store/app-release.apk';
 var filename = config.apkpath; //文件名
 function startDowload() {
-    console.log(filename + '-----正在下载(大小:30M)');
+    console.log('-----正在下载(大小:30M)');
+
+    var timer2 = setInterval(() => {
+         process.stdout.write('.');
+     }, 1011);
+
     downloadFile(fileUrl, filename, function() {
-        console.log(filename + '-----下载完毕');
+        clearInterval(timer2);
+        console.log("\n[下载完毕] "+filename);
+        utils.log("【更新完成】");
     });
 }
 

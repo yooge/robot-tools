@@ -30,7 +30,7 @@ file_put_contents("data/" . $app . '.json', json_encode($version));
 
 //--------> make apk
 
-echo "__UPLOAD_OK";
+echo "___HOTPATCH_OK";
 
 function checkAppID($app)
 {

@@ -5,6 +5,8 @@ app, token  用来通知服务器对代码加密的，
 var server = "http://robots.vnool.com:81";
 //热更新服务器地址， 你可以替换为你自己的服务器，并上传upload.php 到你的服务器。
 var hotpatch_server = server;
+
+//
 var publicKey = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqwEDC2qq+Dg4nwGA+svd
 Nr/Dg4Op1vXeD5H00/4J2KxBplfhc9cexGoisRVcH/GyhjPQtynn79ybWfCo5DxR
@@ -31,6 +33,9 @@ var wgtpath = path.resolve('unpackage/resources/' + version + '.encrypt.wgt');
 var apkpath = path.resolve('unpackage/debug/android_debug.apk');
 var wwwpath = workpath + '/www';
 
+//压缩的代码路径，可供开发者自己使用到老项目中
+var script_pack_bak = path.resolve('unpackage/resources/'+ appid +'.'+version+'.packed.not-encrypt.js');
+
 function checkManifest(argument) {
     if (!fs.existsSync(wwwpath + "/manifest.json")) {
         console.log('\u001b[31m[失败]\u001b[0m 请执行菜单: 发行/本地打包/生成本地app资源');
@@ -38,6 +43,18 @@ function checkManifest(argument) {
     }
     return true;
 }
+
+function writeLine(msg){
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(msg);
+}
+function writeAppend(msg){
+    //process.stdout.clearLine();
+    //process.stdout.cursorTo(0);
+    process.stdout.write(msg);
+}
+
 module.exports = {
     server,
     hotpatch_server,
@@ -52,5 +69,7 @@ module.exports = {
     apkpath,
     unpackagepath,
     manifest,
-    checkManifest
+    checkManifest,
+    script_pack_bak,
+    writeLine, writeAppend
 }
