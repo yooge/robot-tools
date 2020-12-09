@@ -22,6 +22,9 @@ function makePack(done) {
 		if (stats.hasWarnings()) {
 			console.warn(info.warnings);
 		}
+        
+        var out = config.outpath + '/' + config.outfile;
+        console.log('   混淆后的文件: ' + out);
 
 		done();
 	});

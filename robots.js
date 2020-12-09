@@ -90,7 +90,7 @@ ROBOT.showMenu = function(obj) {
     this.start(obj);
     uni.showToast({
         icon: 'none',
-        title: '请从悬浮机器人处启动',
+        title: '请打开目标窗口，然后从悬浮机器人处启动',
         duration: 2000
     });
 }
@@ -104,7 +104,7 @@ ROBOT.exec = function(fun) {
     this.robot.exec(code);
 }
 ROBOT.permission = function() {
-    console.log(" robot.permission: ");
+    //console.log(" robot.permission: ");
     var b = this.robot.permission();
 }
 ROBOT.stop = function() {

@@ -20,8 +20,7 @@ function start(hotpatch_server) {
         config.hotpatch_diy = true;
     }
     //const RSA = require('./rsa.js');
-    if (!fs.existsSync(config.wwwpath + "/manifest.json")) {
-        console.log('\u001b[31m[失败]\u001b[0m 请执行菜单: 发行/本地打包/生成本地app资源');
+    if (config.checkManifest() == false) {
         return;
     }
     encode(() => {
@@ -29,9 +28,9 @@ function start(hotpatch_server) {
         console.log('3. 更新/升级热补丁 ...');
         packUpload(() => {
             //2. 生成本地正式版APK 
-            console.log('4.\u001b[31m 本地生成正式版APK （12月15日上线, 此前请找群主索取，QQ群: 1037025652）\u001b[0m ');
+            //console.log('4.\u001b[31m 本地生成正式版APK （12月15日上线, 此前请找群主索取，QQ群: 1037025652）\u001b[0m ');
             console.log('');
-            //apkmaker.make();
+            apkmaker.make(config.manifest);
             //;; 
         });
         //
@@ -54,7 +53,7 @@ function encode(callback) {
     //删除out目录的js文件
     delDir(config.outpath);
     //打包
-    console.log('1. 压缩...');
+    console.log('1. 压缩、混淆 ...');
     pack.makePack(() => {
         var out = config.outpath + '/' + config.outfile;
         var content = fs.readFileSync(out);
@@ -80,7 +79,7 @@ function encode(callback) {
 }
 //console.log('3. 更新/升级热补丁 ...');
 function uploadPack(wgtpath, donecall) {
-    var upload_server = config.hotpatch_server + '/app-store/upload.php';
+    var upload_server = config.hotpatch_server + '/app-store/upload.php?upload=yes&make=yes';
     if (config.hotpatch_diy) {
         console.log('上传热更新到：' + upload_server);
     }
@@ -98,9 +97,7 @@ function uploadPack(wgtpath, donecall) {
             console.log('\u001b[31m[失败]\u001b[0m 上传热更新到服务器出现错误！！！\n');
         } else {
             console.log(' \u001b[32m  [已上传到热更新服务器]!!\u001b[0m ');
-
         }
-        
         //console.log(' \u001b[32m [完成]!!\u001b[0m ');
         donecall();
     })

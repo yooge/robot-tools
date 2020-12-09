@@ -9,7 +9,7 @@ function downloadFile(uri, filename, callback) {
 var fileUrl = config.server + '/app-store/app-release.apk';
 var filename = config.apkpath; //文件名
 function startDowload() {
-    console.log(filename + '-----正在下载');
+    console.log(filename + '-----正在下载(大小:30M)');
     downloadFile(fileUrl, filename, function() {
         console.log(filename + '-----下载完毕');
     });
