@@ -7,9 +7,6 @@ const pathAnalysis = {
     },
     //准备脚本资源
     prepareResorce: function(obj, readyCall) {
-        if (obj.arguments == undefined) {
-            obj.arguments = {};
-        }
         // 默认为无缓存模式
         if (obj.httpCacheType == undefined) {
             obj.httpCacheType = this.HttpCacheType.NONE;
@@ -29,18 +26,21 @@ const pathAnalysis = {
                 readyCall(obj);
             })
         } else {
-            if (jsfile.startsWith('/')) { //----- 2. 绝对路径
+            if (jsfile.startsWith('/')) { //------------------  2. 绝对路径
                 var p = jsfile.lastIndexOf('/');
                 obj.dir = jsfile.substr(0, p);
                 //obj.file = tmpjsfile;  //还是执行自己
-            } else { //----- 3.相对路径
+            } else { //---------------------------------------- 3.相对路径
                 var _entry = jsfile;
-                if (jsfile.endsWith('.js')) {
+                if (jsfile.endsWith('.js')) { //去掉js， Why， 不告诉你
                     _entry = _entry.substr(0, _entry.length - 3);
                 }
+                obj.arguments._entry = _entry;
+                //绝对路径
                 obj.dir = plus.io.convertLocalFileSystemURL('static/robots/');
                 obj.file = '_entry.js';
-                obj.arguments._entry = _entry;
+                //判断文件是否存在, 不存在就写入一个
+                this.checkEntryfile(obj.dir + obj.file);
             }
             readyCall(obj);
         }
@@ -107,6 +107,24 @@ const pathAnalysis = {
                 }
             }
         });
+    },
+    checkEntryfile: function(path) { 
+        var that = this;
+        //code = that._entrycode();
+         
+    },
+    _entrycode: function() {
+        return `
+            var fname = app.args._entry;
+            var path = './' + fname + '.js';
+            console.log('>>>>');
+            if (fname == '_blank') {
+
+            } else if (!files.exists(path)) {
+                console.log('文件找不到: ' + path);
+            } else if (fname) {
+                require('./' + fname + '.js');
+            }`;
     }
 }
 module.exports = pathAnalysis;

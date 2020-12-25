@@ -20,7 +20,7 @@ var ROBOT = {};
     return;
     //#endif
     var robot;
-    robot = global.robot = uni.requireNativePlugin('Robot');
+    robot = uni.requireNativePlugin('Robot');
     robot.init(plus.runtime.appid, (msg) => {
         console.log("[init] -> " + msg);
         if (msg != 'fail') {
@@ -33,7 +33,8 @@ var ROBOT = {};
     });
     ROBOT = {
         robot: robot,
-        isready: false,
+        //isready: false,
+        started: true,
         permission: () => {},
         start: () => {},
         stop: () => {},
@@ -53,19 +54,35 @@ ROBOT.start = function(obj) {
     // #ifndef APP-PLUS
     return; //非手机环境
     // #endif
-
-    if (obj.arguments == undefined && obj.vue) {
-        obj.arguments = obj.vue.$data;
+    if (typeof(obj) == 'string') {
+        obj = {
+            file: obj
+        }
     }
-
+    if (obj.arguments == undefined) {
+        if (obj.vue) {
+            obj.arguments = obj.vue.$data;
+        } else {
+            obj.arguments = {};
+        }
+    }
+    //
     //准备脚本资源
     this.prepareResorce(obj, (params) => {
         params.arguments.__vue_keys = keys4back(params.vue);
-
         that.params = params;
         that.robot.setJsDir(params.dir);
         that.robot.setJsFile(params.file);
         that.robot.setJsArguments(JSON.stringify(params.arguments));
+        that.robot.setFailCallback(function(msg){
+            if(obj.fail!=undefined) obj.fail(msg);
+        });
+        that.robot.setStartCallback(function(){
+            if(obj.start!=undefined) obj.start();
+        });
+        that.robot.setFinishCallback(function(res){
+            if(obj.finish!=undefined) obj.finish(res);
+        });
         that.robot.setJsCallback(function(data) {
             var rlt = that.vueCallback(data);
             that.robot.backVueData(rlt);
@@ -76,6 +93,7 @@ ROBOT.start = function(obj) {
             var nothing_; //not start
             that.permission(); //检查权限，让悬浮窗出来
         } else {
+            that.started = true;
             that.robot.start();
         }
         return that;
@@ -95,12 +113,17 @@ ROBOT.showMenu = function(obj) {
     });
 }
 ROBOT.exec = function(fun) {
+    if (!this.started) {
+        //执行一个空内容
+        this.start('_blank');
+    }
     var code = fun.toString();
     if (typeof(fun) == 'function') {
         code = "(" + code + ")();"
     }
-    code += "; var __f__=function(tag, msg, file){ console.log(msg)}";
-    console.log(code);
+    var pre_code = "var __f__=function(tag, msg, file){ console.log(msg)};";
+    code = pre_code + code;
+    //console.log(code);
     this.robot.exec(code);
 }
 ROBOT.permission = function() {
