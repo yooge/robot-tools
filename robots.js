@@ -133,12 +133,13 @@ ROBOT.showMenu = function(obj) {
 }
 //为exec准备环境
 var checkTimer = null;
-ROBOT.exec = function(fun) {
+ROBOT.exec = function(fun) { 
+    
     var that = this;
-    if (that.started) {
+    if (that.started) { 
         return exec_do(fun);
     }
-    //执行一个空内容 
+    //执行一个空内容 , 绑定各种参数
     this.start('_blank'); //这是个异步操作 
     if (checkTimer != null) return;
     checkTimer = setInterval(() => {
@@ -153,6 +154,11 @@ ROBOT.exec = function(fun) {
 }
 
 function exec_do(fun) {
+    var code =  getJsCode(fun);
+    //console.log(code);
+    ROBOT.robot.eval(code);
+}
+function getJsCode(fun) {
     var code = fun.toString();
     if (typeof(fun) == 'function') {
         code = "(" + code + ")();"
@@ -160,8 +166,9 @@ function exec_do(fun) {
     var pre_code = "var __f__=function(tag, msg, file){ console.log(msg)};";
     code = pre_code + code;
     //console.log(code);
-    ROBOT.robot.exec(code);
+    return (code);
 }
+
 ROBOT.permission = function() {
     //console.log(" robot.permission: ");
     var b = this.robot.permission();
