@@ -51,15 +51,17 @@ app.vue.test() //访问methods里面的 test函数。 此用法可以淘汰上�
 ```
 
 
-## 3. 发布项目   
+## 3. 发布项目
 默认使用本项目的热更新服务器
 ```js
-robot-tools deploy
+robot-tools deploy   //生成apk
+robot-tools deploy apk=false  //不生成apk
 ```
 
 #### 3.2 自定义热更新服务器
 ```js 
-robot-tools deploy  http://abc.com/
+robot-tools deploy apk=false server=default
+robot-tools deploy apk=false server=http://abc.com/
 ```
 请上传upload.php 到你的服务器位置 http://abc.com/app-store/upload.php
 

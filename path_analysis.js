@@ -108,10 +108,9 @@ const pathAnalysis = {
             }
         });
     },
-    checkEntryfile: function(path) { 
+    checkEntryfile: function(path) {
         var that = this;
         //code = that._entrycode();
-         
     },
     _entrycode: function() {
         return `

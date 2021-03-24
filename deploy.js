@@ -14,13 +14,19 @@ const compressing = require('compressing');
 var config = require('./config.js');
 var apkmaker = require('./apkMaker.js');
 var utils = require('./utils.js');
+var cfg_make_apk = true;
 
-
-function start(hotpatch_server) {
-    if (hotpatch_server != undefined) {
-        config.hotpatch_server = hotpatch_server;
+function start(cfg) {
+    if (cfg.server == undefined || cfg.server == 'default') {
+        //默认
+        ; //默认
+    } else {
+        config.hotpatch_server = cfg.server;
         config.hotpatch_diy = true;
     }
+    if (cfg.apk == 'false') {
+        cfg_make_apk = false;
+    } 
     //const RSA = require('./rsa.js');
     if (config.checkManifest() == false) {
         return;
@@ -31,8 +37,10 @@ function start(hotpatch_server) {
         packUpload(() => {
             //2. 生成本地正式版APK 
             //console.log('4.\u001b[31m 本地生成正式版APK （12月15日上线, 此前请找群主索取，QQ群: 1037025652）\u001b[0m ');
-            utils.log('4. 开始打包..');
-            apkmaker.make(config.manifest);
+            if (cfg_make_apk == true) {
+                utils.log('4. 开始打包..');
+                apkmaker.make(config.manifest);
+            }
             //;; 
         });
         //
