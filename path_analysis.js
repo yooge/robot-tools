@@ -29,7 +29,7 @@ const pathAnalysis = {
             if (jsfile.startsWith('/')) { //------------------  2. 绝对路径
                 var p = jsfile.lastIndexOf('/');
                 obj.dir = jsfile.substr(0, p);
-                //obj.file = tmpjsfile;  //还是执行自己
+                obj.file = jsfile.substr(p+1);  //还是执行自己
             } else { //---------------------------------------- 3.相对路径
                 var _entry = jsfile;
                 if (jsfile.endsWith('.js')) { //去掉js， Why， 不告诉你

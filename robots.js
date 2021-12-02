@@ -118,6 +118,12 @@ ROBOT.moveMenu = function(x, y) {
         this.robot.moveMenu(x, y)
     } catch (e) {}
 }
+ROBOT.closeMenu = function() {
+    try { //
+        this.robot.closeMenu()
+    } catch (e) {}
+}
+
 ROBOT.showMenu = function(obj) {
     if (obj.arguments == undefined && obj.vue) {
         obj.arguments = obj.vue.$data; //改成复制比较好
@@ -133,14 +139,14 @@ ROBOT.showMenu = function(obj) {
 }
 //为exec准备环境
 var checkTimer = null;
-ROBOT.exec = function(fun) { 
-    
+ROBOT.exec = function(fun) {
+
     var that = this;
-    if (that.started) { 
+    if (that.started) {
         return exec_do(fun);
     }
     //执行一个空内容 , 绑定各种参数
-    this.start('_blank'); //这是个异步操作 
+    this.start('_blank'); //这是个异步操作
     if (checkTimer != null) return;
     checkTimer = setInterval(() => {
         if (that.started) {
