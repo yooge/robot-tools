@@ -1,10 +1,12 @@
 /*
 app, token  用来通知服务器对代码加密的，
 */
-//加密服务器地址
-var server = "http://robots.shen-x.com";
-//热更新服务器地址， 你可以替换为你自己的服务器，并上传upload.php 到你的服务器。
-var hotpatch_server = server;
+//server 加密服务器地址
+var server = "http://rpa.shen-x.com";
+
+//hotpatch_server 热更新服务器地址， 你可以替换为你自己的服务器，并上传upload.php 到你的服务器。
+var hotpatch_server =  server;
+var codepack_server = server;
 
 //
 var publicKey = `-----BEGIN PUBLIC KEY-----
@@ -26,10 +28,12 @@ var entry = path.resolve('./static/robots/_entry.js');
 //entry = path.resolve('./static/test-pack/index.js');
 //console.log(entry);;
 var unpackagepath = path.resolve('unpackage/');
+var resourcespath = path.resolve('unpackage/resources/');
 var outpath = path.resolve('unpackage/resources/' + appid + '/www/static/robots/');
 var workpath = path.resolve('unpackage/resources/' + appid);
 //var wgtpath = path.resolve('unpackage/resources/' + appid + '.' + version + '.encrypt.wgt');
 var wgtpath = path.resolve('unpackage/resources/' + version + '.encrypt.wgt');
+var wgtpath4app = path.resolve('unpackage/resources/' + appid+ '.wgt');
 var apkpath = path.resolve('unpackage/debug/android_debug.apk');
 var wwwpath = workpath + '/www';
 
@@ -37,10 +41,25 @@ var wwwpath = workpath + '/www';
 var script_pack_bak = path.resolve('unpackage/resources/'+ appid +'.'+version+'.packed.not-encrypt.js');
 
 function checkManifest(argument) {
-    if (!fs.existsSync(wwwpath + "/manifest.json")) {
+
+  var www_manifest_path =wwwpath + "/manifest.json";
+  //console.log(www_manifest_path);
+
+    if (!fs.existsSync(www_manifest_path)) {
         console.log('\u001b[31m[失败]\u001b[0m 请执行菜单: 发行/本地打包/生成本地app资源');
         return false;
     }
+
+   eval('global.wwwmanifest = ' + fs.readFileSync(www_manifest_path, 'utf-8'));
+   wwwmanifest.package = manifest.package;
+   wwwmanifest.appkey = manifest.appkey;
+   wwwmanifest.splash = manifest.splash;
+   wwwmanifest.logo = manifest.logo;
+
+   fs.writeFileSync(www_manifest_path, JSON.stringify(wwwmanifest));
+
+
+   //process.exit();;;
     return true;
 }
 
@@ -58,14 +77,15 @@ function writeAppend(msg){
 module.exports = {
     server,
     hotpatch_server,
+    codepack_server,
     hotpatch_diy: false,
     publicKey,
     entry,
     outfile: '_entry.js',
     outpath,
-    workpath,
+    workpath,resourcespath,
     wwwpath,
-    wgtpath,
+    wgtpath,wgtpath4app,
     apkpath,
     unpackagepath,
     manifest,

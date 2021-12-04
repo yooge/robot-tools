@@ -1,6 +1,6 @@
 // 全量安装
 var utils = require('./install.utils.js');
-const version_manager_install = "http://robots.vnool.com:81/app-store/install.php?";
+const version_manager_install = "http://rpa.shen-x.com/app-store/install.php?";
 var download_url = '';
 var download_ver = '';
 var curVersion = "";

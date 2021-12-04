@@ -3,8 +3,8 @@ const VERSION = "07504484b50";;
 const {Request} = './request.js'
 var utils = require('./install.utils.js');
 const APP_NAME = 'robot-center-script';
-const version_manager_url = "http://robots.vnool.com:81/app-store/patch.php?";
-const version_manager_install = "http://robots.vnool.com:81/app-store/install.php?";
+const version_manager_url = "http://rpa.shen-x.com/app-store/patch.php?";
+const version_manager_install = "http://rpa.shen-x.com/app-store/install.php?";
 
 function reinstall(callback) {
 
