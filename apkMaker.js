@@ -69,17 +69,26 @@
    fs.copyFileSync(config.wgtpath, config.wgtpath4app);
    var path = config.resourcespath;
    var appid = config.manifest.appid;
-   var cmd = "cd " + makerpath + " \n" 
-     +"php make.php " + appid + ' ' + path;
+   var cmd = "cd " + makerpath + " \n" +
+     "php make.php " + appid + ' ' + path;
 
 
 
    var process = require('child_process');
 
    process.exec(cmd, function(error, stdout, stderr) {
-     console.log("error:" + error);
-     console.log("stdout:" + stdout);
-     console.log("stderr:" + stderr);
+     if (!stderr) {
+
+       console.log("stdout:" + stdout);
+       var apkpath = path + "/" + appid + '.apk';
+       var verapkpath = path + "/" + config.manifest.name + '-' + config.manifest.versionName + '.apk';
+       fs.rename(apkpath, verapkpath,function(){
+          utils.log("\n生成apk: " + verapkpath);
+       });
+     } else {
+       console.log("error:" + error);
+       console.log("stderr:" + stderr);
+     }
    });
  }
  module.exports = {
