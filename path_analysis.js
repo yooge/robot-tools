@@ -40,7 +40,7 @@ const pathAnalysis = {
                 obj.dir = plus.io.convertLocalFileSystemURL('static/robots/');
                 obj.file = '_entry.js';
                 //判断文件是否存在, 不存在就写入一个
-                this.checkEntryfile(obj.dir + obj.file);
+                this.checkEntryfile(obj.dir , obj.file);
             }
             readyCall(obj);
         }
@@ -108,9 +108,22 @@ const pathAnalysis = {
             }
         });
     },
-    checkEntryfile: function(path) {
+    checkEntryfile: function(dir, file) {
         var that = this;
-        //code = that._entrycode();
+        var path = dir + file;
+		plus.io.requestFileSystem(plus.io.PRIVATE_WWW, function(fs) {
+			// fs.root是根目录操作对象DirectoryEntry
+			let a = fs.root.toURL()
+			fs.root.getFile(path, {
+				create: false
+			}, function(fileEntry) {
+				//callback(fileEntry);
+			}, function(error) {
+				console.error(error.message + ", file: "+ file);
+				
+			}); //fs.root.getFile
+			
+		}) //plus.io.requestFileSystem
     },
     _entrycode: function() {
         return `
