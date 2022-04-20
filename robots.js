@@ -109,9 +109,10 @@ ROBOT.init = function(obj) {
 	})
 }
 ROBOT.start = function(params) {
-	if(params!=undefined){
+	if (params != undefined) {
 		this.init(params);
 	}
+	this.menu.show();
 	this.robot.start();
 }
 ROBOT.menu = {};
@@ -143,7 +144,7 @@ ROBOT.showMenu = function(obj) {
 	uni.showToast({
 		icon: 'none',
 		title: "请打开目标窗口，\n然后从悬浮机器人处启动",
-		duration: 3000
+		duration: 5000
 	});
 }
 //为exec准备环境
@@ -171,7 +172,7 @@ ROBOT.exec = function(fun) {
 function exec_do(fun) {
 	var code = getJsCode(fun);
 	console.log('start eval');
-	code = "__exec_autofinish ='yes'; "+code;
+	code = "__exec_autofinish ='yes'; " + code;
 	return ROBOT.robot.eval(code);
 }
 
@@ -185,12 +186,16 @@ function getJsCode(fun) {
 	//console.log(code);
 	return (code);
 }
-
+//检查权限
 ROBOT.permission = function() {
-	//console.log(" robot.permission: ");
+	console.log(" robot.permission: "); 
 	var b = this.robot.permission();
 	return b;
 }
+
+ 
+
+
 ROBOT.stop = function() {
 	// #ifndef APP-PLUS
 	return; //非手机环境
