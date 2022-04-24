@@ -147,13 +147,27 @@ ROBOT.showMenu = function(obj) {
 		duration: 5000
 	});
 }
+//执行新代码
+ROBOT.exec = function(fun) {
+	// var dir = plus.io.convertLocalFileSystemURL('static/robots/');
+	// this.robot.setJsDir(dir);
+	
+	var code = getJsCode(fun);
+	//console.log('start exec');
+	//console.log('code =>' + code);
+	//console.log('------ code ');
+	return ROBOT.robot.exec(code);
+}
+
 //为exec准备环境
 var checkTimer = null;
-ROBOT.exec = function(fun) {
-
+ROBOT.eval = function(fun) {
+	return eval_do(fun);
+	;////////不要搞这么麻烦了
+	;
 	var that = this;
 	if (that.started) {
-		return exec_do(fun);
+		return eval_do(fun);
 	}
 	//执行一个空内容 , 绑定各种参数
 	this.start('_blank'); //这是个异步操作
@@ -163,37 +177,53 @@ ROBOT.exec = function(fun) {
 			if (checkTimer) {
 				clearInterval(checkTimer);
 				checkTimer = null;
-				return exec_do(fun);
+				return eval_do(fun);
 			}
 		}
 	}, 500);
 }
 
-function exec_do(fun) {
+function eval_do(fun) {
 	var code = getJsCode(fun);
-	console.log('start eval');
+	//console.log('start eval');
 	code = "__exec_autofinish ='yes'; " + code;
 	return ROBOT.robot.eval(code);
 }
+ROBOT.eval_do = eval_do;
 
 function getJsCode(fun) {
+	if (typeof(fun) == 'string') {
+		return fun;
+	}
 	var code = fun.toString();
 	if (typeof(fun) == 'function') {
 		code = "(" + code + ")();"
 	}
-	var pre_code = "var __f__=function(tag, msg, file){ console.log(msg)};";
+
+	var pre_code = "var " + consolename() + "=function(tag, msg, file){ console[tag](msg)};";
 	code = pre_code + code;
 	//console.log(code);
 	return (code);
 }
+
+function consolename() {
+	var _log2name = function() {
+		console.log('log2name');
+	}
+	var buf = _log2name.toString();
+	var p = buf.indexOf('{');
+	var p2 = buf.indexOf('("log"');
+	var funcName = buf.substring(p + 1, p2 );
+	return funcName;
+}
 //检查权限
 ROBOT.permission = function() {
-	console.log(" robot.permission: "); 
+	console.log(" robot.permission: ");
 	var b = this.robot.permission();
 	return b;
 }
 
- 
+
 
 
 ROBOT.stop = function() {
