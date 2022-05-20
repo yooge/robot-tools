@@ -69,12 +69,9 @@ ROBOT.init = function(obj) {
 			obj.arguments = {};
 		}
 	}
-	var dcloud_control = that.robot.assets('data/dcloud_control.xml', 'utf-8');
-	if (dcloud_control.indexOf('debug="true"') > 0) {
-		obj.arguments._debug = true;
-	} else {
-		obj.arguments._debug = false;
-	}
+
+	obj.arguments._debug = ROBOT.isDebug;
+
 
 	this.started = false;
 	//
@@ -121,7 +118,6 @@ ROBOT.menu.move = function(x, y) {
 		ROBOT.robot.moveMenu(x, y)
 	} catch (e) {}
 }
-
 ROBOT.menu.close = function() {
 	try { //
 		ROBOT.robot.closeMenu()
@@ -132,9 +128,26 @@ ROBOT.menu.show = function() {
 		ROBOT.robot.startMenu();
 	} catch (e) {}
 }
-ROBOT.menu.hide = function() {
+
+
+
+function _isDebug() {
+	var dcloud_control = ROBOT.robot.assets('data/dcloud_control.xml', 'utf-8');
+	if (dcloud_control.indexOf('debug="true"') > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+// #ifdef APP-PLUS
+ROBOT.isDebug = _isDebug();
+//#endif
+
+//state: stoped,starting
+ROBOT.menu.state = function(state) {
 	try {
-		ROBOT.robot.hideMenu();
+		ROBOT.robot.changeMenu(state);
 	} catch (e) {}
 }
 
@@ -147,11 +160,13 @@ ROBOT.showMenu = function(obj) {
 		duration: 5000
 	});
 }
+ROBOT.closeMenu = ROBOT.menu.close;
+
 //执行新代码
 ROBOT.exec = function(fun) {
 	// var dir = plus.io.convertLocalFileSystemURL('static/robots/');
 	// this.robot.setJsDir(dir);
-	
+
 	var code = getJsCode(fun);
 	//console.log('start exec');
 	//console.log('code =>' + code);
@@ -162,8 +177,7 @@ ROBOT.exec = function(fun) {
 //为exec准备环境
 var checkTimer = null;
 ROBOT.eval = function(fun) {
-	return eval_do(fun);
-	;////////不要搞这么麻烦了
+	return eval_do(fun);; ////////不要搞这么麻烦了
 	;
 	var that = this;
 	if (that.started) {
@@ -213,7 +227,7 @@ function consolename() {
 	var buf = _log2name.toString();
 	var p = buf.indexOf('{');
 	var p2 = buf.indexOf('("log"');
-	var funcName = buf.substring(p + 1, p2 );
+	var funcName = buf.substring(p + 1, p2);
 	return funcName;
 }
 //检查权限
@@ -236,6 +250,8 @@ ROBOT.stop = function() {
 	this.started = false;
 	this.robot.stop();
 }
+
+
 String.prototype.replaceAll = function(s1, s2) {
 	return this.replace(new RegExp(s1, "gm"), s2);
 }

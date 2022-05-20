@@ -27,6 +27,49 @@ robot.stop();
 robot.start(param); 
 
 ```
+```js
+/*
+
+file:  
+//1. 脚本脚本(static/robots/目录下的demo.js)，
+//2. 或绝对路径/sdcard/xxx.js，
+//3. 或远程URL(也可以用发布的打包加密代码)
+
+arguments: 
+//可选, json,传递给脚本的参数。
+//可以在控制脚本脚本中用app.args获取
+//如果不传递参数，则系统会默认传递'当时'的vue的$data数据；
+//如果控制脚本想动态获取vue的$data的数据，请往下看
+*/
+
+//启动脚本
+autojs.start(param); 
+
+//停止脚本
+autojs.stop();
+
+//仅设置初始化参数，不执行代码
+autojs.init(param); 
+//根据上面设置好的参数，执行代码； 也可以在悬浮脚本上点启动按钮
+autojs.start(); 
+
+autojs.menu.show(); //显示悬浮脚本图标 
+autojs.menu.move(x,y); //移动悬浮脚本图标
+autojs.menu.close(); //隐藏悬浮脚本图标
+autojs.showMenu(param); //执行脚本并显示脚本图标
+
+
+
+var isEnabled = autojs.permission();//检查是否启动了无障碍
+
+
+//在当前已经运行的脚本的上下文中执行
+autojs.eval(代码或函数);
+
+//在新是脚本上下文执行
+autojs.exec(代码或函数);
+
+```
 #### 机器人脚本,请参考 https://github.com/yooge/robot
 .
 .
@@ -57,6 +100,10 @@ app.vue.test() //访问methods里面的 test函数。 此用法可以淘汰上�
 robot-tools deploy   //生成apk
 robot-tools deploy apk=false  //不生成apk
 ```
+过程：  
+* 1. 压缩，混淆，（将你的工程代码进行压缩，混淆）
+* 2. 加密，将代码进行加密操作
+* 3. 制作热补丁并上传
 
 #### 3.2 自定义热更新服务器
 ```js 
