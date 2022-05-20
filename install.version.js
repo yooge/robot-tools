@@ -26,7 +26,7 @@ function checkThenInstall(loadingText) {
 		}
 
 		checkVersion(channel, (res) => {
-			console.log('new version: ' + res.version);
+			console.log('remote version: ' + res.version);
 			if (curVersion != res.version) { //准备更新
 				// plus.nativeUI.confirm("是否安装更新？", function(e){
 				// 	console.log("Close confirm: "+e.index);
@@ -50,7 +50,7 @@ function checkVersion(channel, callback) {
 		return false;
 	}
 	return checkInfo(channel, (res) => {
-		console.log(res);
+		//console.log(res);
 		if (res.err != undefined) {
 			console.log(res.err);
 			callback('ignore');

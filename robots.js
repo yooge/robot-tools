@@ -22,13 +22,13 @@ var ROBOT = {};
 	var robot;
 	robot = uni.requireNativePlugin('Robot');
 	robot.init(plus.runtime.appid, (msg) => {
-		console.log("[init] -> " + msg);
 		if (msg != 'fail') {
 			return; //good
 		}
+		console.log("[init] -> " + msg);
 		uni.showModal({
 			title: '提示',
-			content: 'Appid未设置',
+			content: 'appid未设置(robot)',
 		});
 	});
 	ROBOT = {
