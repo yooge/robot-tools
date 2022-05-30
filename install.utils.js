@@ -28,11 +28,11 @@ function installZipUrl(zipurl, callback) {
 	//安装
 	function install(wgt, callback) {
 		console.log('start install!!!');
-		console.log(wgt);
+		//console.log(wgt);
 		plus.runtime.install(wgt, {
 			force: true
 		}, function() {
-			console.log('YYYYYY!!!!!!!!!');
+			//console.log('YYYYYY!!!!!!!!!');
 			callback('ok');
 		}, function(r) {
 			console.log(r);

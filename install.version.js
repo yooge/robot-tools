@@ -12,8 +12,12 @@ function checkThenInstall(loadingText) {
 	// #ifndef APP-PLUS
 	return; //非手机环境
 	// #endif
-
-	plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
+	
+	var appid = plus.runtime.appid;
+    var appid2 = manifest().id;  //使用包内的appid
+	if(appid2) appid = appid2;
+	
+	plus.runtime.getProperty(appid, (wgtinfo) => {
 		//console.log(wgtinfo);
 
 		curVersion = wgtinfo.version;
@@ -103,7 +107,7 @@ function do_install(callback) {
 function checkInfo(channel, callback) {
 
 	var url = version_manager_install + "app=" + channel;;
-	console.log(url);
+	//console.log(url);
 	uni.request({
 		url: url,
 		type: 'GET',
