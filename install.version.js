@@ -12,11 +12,11 @@ function checkThenInstall(loadingText) {
 	// #ifndef APP-PLUS
 	return; //非手机环境
 	// #endif
-	
+
 	var appid = plus.runtime.appid;
-    var appid2 = manifest().id;  //使用包内的appid
-	if(appid2) appid = appid2;
-	
+	var appid2 = manifest().id; //使用包内的appid
+	if (appid2) appid = appid2;
+
 	plus.runtime.getProperty(appid, (wgtinfo) => {
 		//console.log(wgtinfo);
 
@@ -138,7 +138,54 @@ function manifest() {
 	manifestInfo.isDebug = global.ROBOT_CURRENT.isDebug;
 	return manifestInfo;
 }
+/*
+async function savedManifest() {
+	var mf_path = plus.io.convertLocalFileSystemURL('./manifest.json');
+	var x = await getFileText(mf_path);
+}
 
+
+function getFileText(path) {
+	return new Promise(resolve => { //文件读写是一个异步请求 用promise包起来方便使用时的async+await
+		plus.io.requestFileSystem(plus.io.PRIVATE_WWW, fs => { //请求文件系统
+				fs.root.getFile(path, {
+					create: false //当文件不存在时创建
+				}, fileEntry => {
+					fileEntry.file(function(file) {
+						let fileReader = new plus.io
+						.FileReader() //new一个可以用来读取文件的对象fileReader
+						fileReader.readAsText(file, 'utf-8') //读文件的格式
+						fileReader.onerror = e => { //读文件失败
+							console.log('获取文件失败', fileReader.error)
+							// plus.nativeUI.toast("获取文件失败,请重启应用", {
+							//   background: '#ffa38c',
+							// })
+							return;
+						}
+						fileReader.onload = e => { //读文件成功
+							let txtData = e.target.result
+							resolve(txtData) ////回调函数内的值想返回到函数外部  就用promise+resolve来返回出去
+						}
+					})
+				}, error => {
+					console.log('2新建获取文件失败', error)
+					// plus.nativeUI.toast("获取文件失败,请重启应用", {
+					//   background: '#ffa38c',
+					// });
+					return;
+				})
+			},
+			e => {
+				console.log('1请求文件系统失败', e.message)
+				// plus.nativeUI.toast("请求系统失败,请重启应用", {
+				//   background: '#ffa38c',
+				// });
+				return;
+			}
+		);
+	});
+}
+*/
 
 var isDebug = 'undefined';
 // #ifdef APP-PLUS
