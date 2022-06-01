@@ -7,6 +7,7 @@ var install_version = require('./install.version.js');
 module.exports = {
     robot,
     version: install_version,
+	project: install_version.project,
     autojs: robot
     //patch,
 };
