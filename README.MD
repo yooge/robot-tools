@@ -110,8 +110,9 @@ robot-tools deploy apk=false  //不生成apk
 robot-tools deploy apk=false server=default
 robot-tools deploy apk=false server=http://abc.com/
 ```
-请上传upload.php 到你的服务器位置 http://abc.com/app-store/upload.php
-
+请上传upload.php 到你的服务器位置 http://abc.com/app-store/upload.php  
+wgt文件就会存到你的服务器上
+然后在代码中使用  version.install(callback, url_wgt);
 
 ## 4. 热更新
 ### 4.1 直接升级
@@ -123,25 +124,28 @@ require('robot-tools').version.checkThenInstall();
 ```js
 const {version} = require('robot-tools');
 
-plus.runtime.getProperty(plus.runtime.appid, (wgtinfo) => {
-        curVersion = wgtinfo.version;
-        version.checkVersion((res) => {
-            console.log('new version: ' + res.version);
-
-            uni.showLoading({
-                title: '加载中...'
-            });
-            if (curVersion != res.version) { //准备更新
-                // plus.nativeUI.confirm("是否安装更新？", function(e){
-                // 	console.log("Close confirm: "+e.index);
-                // });
-                version.install((status) => {
-                    //
-                    //
-                });
-            }
-        });
-    });
+ uni.showLoading({
+       title: '加载中...'
+  });
+version.checkVersion((res) => {
+	console.log('current version: ' + version.name);
+	console.log('remote version: ' + res.version);
+	if (version.name != res.version) { //准备更新
+		// plus.nativeUI.confirm("是否安装更新？", function(e){
+		// 	console.log("Close confirm: "+e.index);
+		// });
+		version.install(res.download, (status) => {
+			//
+			//
+		});
+	} else {
+		if (loadingText) {
+			uni.hideLoading();
+		}
+	}
+});
+	
+ 
 ```
 
 ## 5. API

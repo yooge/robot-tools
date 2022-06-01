@@ -6,23 +6,21 @@ var download_ver = '';
 var curVersion = "";
 //检查直接安装
 function checkThenInstall(loadingText) {
-	if (loadingText == undefined) {
-		loadingText = '加载中...';
-	}
 	// #ifndef APP-PLUS
 	return; //非手机环境
 	// #endif 
 
+	if (loadingText == undefined) {
+		loadingText = '加载中...';
+	}
 	if (loadingText) {
 		uni.showLoading({
 			title: '加载中...'
 		});
 	}
 
-	var curVersion = project.manifest.version.name;
-	console.log('当前程序的版本号:' + curVersion);
-
 	checkVersion((res) => {
+		console.log('current version: ' + project.manifest.version.name);
 		console.log('remote version: ' + res.version);
 		if (curVersion != res.version) { //准备更新
 			// plus.nativeUI.confirm("是否安装更新？", function(e){
