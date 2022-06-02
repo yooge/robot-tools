@@ -22,7 +22,7 @@ function checkThenInstall(loadingText) {
 	checkVersion((res) => {
 		console.log('current version: ' + project.manifest.version.name);
 		console.log('remote version: ' + res.version);
-		if (curVersion != res.version) { //准备更新
+		if (project.manifest.version.name != res.version) { //准备更新
 			// plus.nativeUI.confirm("是否安装更新？", function(e){
 			// 	console.log("Close confirm: "+e.index);
 			// });
@@ -142,54 +142,17 @@ var _appid;
 //读取项目目录的文件
 project.resource = function(filename, resolveBack) {
 	var mf_path = plus.io.convertLocalFileSystemURL(filename);
-	getFileText(mf_path, resolveBack);
+	utils.getFileText(mf_path, resolveBack);
 }
 
 project.resource('./manifest.json', function(res) {
 	project.manifest = (JSON.parse(res));
 	project.appid = project.manifest.appid = project.manifest.id;
 	project.version_name = project.manifest.version.name;
+	
+	if(_onReadyCaller) _onReadyCaller();
 });;
 
-function getFileText(path, resolveBack) {
-	plus.io.requestFileSystem(plus.io.PRIVATE_WWW, fs => { //请求文件系统
-			fs.root.getFile(path, {
-				create: false //当文件不存在时创建
-			}, fileEntry => {
-				fileEntry.file(function(file) {
-					let fileReader = new plus.io
-						.FileReader() //new一个可以用来读取文件的对象fileReader
-					fileReader.readAsText(file, 'utf-8') //读文件的格式
-					fileReader.onerror = e => { //读文件失败
-						console.log('获取文件失败', fileReader.error);
-						// plus.nativeUI.toast("获取文件失败,请重启应用", {
-						//   background: '#ffa38c',
-						// })
-						return;
-					}
-					fileReader.onload = e => { //读文件成功
-						let txtData = e.target.result
-						resolveBack(txtData) ////回调函数内的值想返回到函数外部  就用promise+resolve来返回出去
-					}
-				})
-			}, error => {
-				console.log('2新建获取文件失败', error)
-				// plus.nativeUI.toast("获取文件失败,请重启应用", {
-				//   background: '#ffa38c',
-				// });
-				return;
-			})
-		},
-		e => {
-			console.log('1请求文件系统失败', e.message)
-			// plus.nativeUI.toast("请求系统失败,请重启应用", {
-			//   background: '#ffa38c',
-			// });
-			return;
-		}
-	);
-
-}
 
 
 var isDebug = 'undefined';
@@ -197,6 +160,12 @@ var isDebug = 'undefined';
 isDebug = global.ROBOT_CURRENT.isDebug;
 // #endif
 
+var onReady=null;
+
+// var _onReadyCaller = null;
+// onReady = function(callback){
+// 	_onReadyCaller = callback;
+// }
 
 module.exports = {
 	checkVersion,
@@ -204,12 +173,18 @@ module.exports = {
 	checkThenInstall,
 	manifest,
 	isDebug,
-	project,
+	project
+	
 }
 // module.exports.prototype.appid = function(){
 //    return project.appid;
 // }
-
+var _onReadyCaller = null;
+Object.defineProperty(module.exports, 'onReady', {
+	set(callback) {
+	    _onReadyCaller = callback;
+	}
+});
 Object.defineProperty(module.exports, 'appid', {
 	get() {
 		//console.log('获取')
