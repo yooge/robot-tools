@@ -6,11 +6,11 @@ function installZipUrl(zipurl, callback) {
 		var dtask = plus.downloader.createDownload(zipurl, {}, function(d, status) {
 			//下载完成
 			//alert("bb");
-			console.log(d);
+			//console.log(d);
 			if (status == 200) {
 				//alert("Download success:" + d.filename);
 				//queryFiles();
-				console.log('200');
+				//console.log('200');
 				install(d.filename, callback);
 			} else {
 				console.log("Downlaod failed:" + status);

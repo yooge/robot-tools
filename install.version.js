@@ -40,6 +40,11 @@ function checkThenInstall(loadingText) {
 }
 //检查版本
 function checkVersion(callback) {
+	if (project.manifest == undefined) {
+		//过早的调用，请开发者做个异步即可
+		console.error('checkVersion: Fail: 过早的调用，请在robotjs初始化完成后调用');
+		return;
+	}
 	var channel = project.manifest.appid; //实际安装的appid
 	return checkInfo(channel, (res) => {
 		//console.log(res);
@@ -139,6 +144,7 @@ project.resource = function(filename, resolveBack) {
 	var mf_path = plus.io.convertLocalFileSystemURL(filename);
 	getFileText(mf_path, resolveBack);
 }
+
 project.resource('./manifest.json', function(res) {
 	project.manifest = (JSON.parse(res));
 	project.appid = project.manifest.appid = project.manifest.id;
