@@ -40,6 +40,10 @@ function checkThenInstall(loadingText) {
 }
 //检查版本
 function checkVersion(callback) {
+	// #ifndef APP-PLUS
+	return; //非手机环境
+	// #endif
+
 	if (project.manifest == undefined) {
 		//过早的调用，请开发者做个异步即可
 		console.error('checkVersion: Fail: 过早的调用，请在robotjs初始化完成后调用');
@@ -145,13 +149,21 @@ project.resource = function(filename, resolveBack) {
 	utils.getFileText(mf_path, resolveBack);
 }
 
-project.resource('./manifest.json', function(res) {
-	project.manifest = (JSON.parse(res));
-	project.appid = project.manifest.appid = project.manifest.id;
-	project.version_name = project.manifest.version.name;
-	
-	if(_onReadyCaller) _onReadyCaller();
-});;
+
+
+function prepare() {
+	project.resource('./manifest.json', function(res) {
+		project.manifest = (JSON.parse(res));
+		project.appid = project.manifest.appid = project.manifest.id;
+		project.version_name = project.manifest.version.name;
+
+		if (prepare.onReadyCaller) prepare.onReadyCaller();
+	});;
+}
+prepare.onReadyCaller = null;
+// #ifdef APP-PLUS
+prepare();
+// #endif
 
 
 
@@ -160,7 +172,7 @@ var isDebug = 'undefined';
 isDebug = global.ROBOT_CURRENT.isDebug;
 // #endif
 
-var onReady=null;
+var onReady = null;
 
 // var _onReadyCaller = null;
 // onReady = function(callback){
@@ -174,15 +186,15 @@ module.exports = {
 	manifest,
 	isDebug,
 	project
-	
+
 }
 // module.exports.prototype.appid = function(){
 //    return project.appid;
 // }
-var _onReadyCaller = null;
+
 Object.defineProperty(module.exports, 'onReady', {
 	set(callback) {
-	    _onReadyCaller = callback;
+		prepare.onReadyCaller = callback;
 	}
 });
 Object.defineProperty(module.exports, 'appid', {
