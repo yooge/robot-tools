@@ -10,6 +10,7 @@ npm i robot-tools
 
 [更详细的文档](https://yooge.github.io/robot-docs/autojs-vue.html)
 
+https://yooge.github.io/robot-docs/autojs-vue.html
 
 
 ## 1. 更新/下载基座
