@@ -158,12 +158,14 @@ function prepare() {
 		project.version_name = project.manifest.version.name;
 
 		if (prepare.onReadyCaller) prepare.onReadyCaller();
+		prepare._readyDone  = true;
 	});;
 }
 prepare.onReadyCaller = null;
 // #ifdef APP-PLUS
 prepare();
 // #endif
+prepare._readyDone = false;
 
 
 
@@ -195,6 +197,9 @@ module.exports = {
 Object.defineProperty(module.exports, 'onReady', {
 	set(callback) {
 		prepare.onReadyCaller = callback;
+		if(prepare._readyDone ){ //如果已经过期了，则直接运行
+			return callback();
+		}
 	}
 });
 Object.defineProperty(module.exports, 'appid', {

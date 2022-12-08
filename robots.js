@@ -25,7 +25,7 @@ var ROBOT = {};
 		if (msg != 'fail') {
 			return; //good
 		}
-		console.log("[init] -> " + msg);
+		//console.log("[init] -> " + msg);
 		uni.showModal({
 			title: '提示',
 			content: 'appid未设置(robot)',
@@ -55,7 +55,8 @@ ROBOT.init = function(obj) {
 	return; //非手机环境
 	// #endif
 	if (!that.permission()) {
-		return;
+		//throw new Error('permission fail');
+		return false;
 	}
 	if (typeof(obj) == 'string') {
 		obj = {
@@ -103,11 +104,15 @@ ROBOT.init = function(obj) {
 			return rlt;
 		});
 		return that;
-	})
+	});
+	
+	return true;
 }
 ROBOT.start = function(params) {
 	if (params != undefined) {
-		this.init(params);
+		if(!this.init(params)){
+			return false;
+		}
 	}
 	this.menu.show();
 	this.robot.start();
@@ -152,7 +157,9 @@ ROBOT.menu.state = function(state) {
 }
 
 ROBOT.showMenu = function(obj) {
-	this.init(obj);
+	if(!this.init(obj)){
+		return false;
+	}
 	this.menu.show();
 	uni.showToast({
 		icon: 'none',

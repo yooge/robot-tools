@@ -67,12 +67,25 @@ function packUpload(donecall) {
 }
 
 function encode(callback) {
+	if(config.manifest.encryption=='no')
+	{
+	    utils.log('** 不加密代码！！！');
+		// var out = config.outpath  ;
+		// var bak = config.script_pack_bak;
+	    callback();
+		return;
+	}
+	
     //删除out目录的js文件
-    delDir(config.outpath);
+     delDir(config.outpath);
+	
     //打包
     utils.log('1. 压缩、混淆 ...');
     pack.makePack(() => {
         var out = config.outpath + '/' + config.outfile;
+		
+		
+		
         var content = fs.readFileSync(out);
         //content = RSA.encode(content);
         utils.log('2. 加密...');
