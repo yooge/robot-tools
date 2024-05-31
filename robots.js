@@ -19,9 +19,23 @@ var ROBOT = {};
 	// #ifndef APP-PLUS
 	return;
 	//#endif
-	var robot;
-	robot = uni.requireNativePlugin('Robot');
-	robot.init(plus.runtime.appid, (msg) => {
+	var robot; 
+	try {  
+	    robot = uni.requireNativePlugin('Robot');  
+	} catch (e) {    
+	    console.error('原生内核不存在，请使用自定义基座运行，相关文档https://yooge.github.io/robot-docs/hbuilder.html#hbuilder_1', e);
+		uni.showModal({
+			title: '提示',
+			content: '基座不对，请使用自定义基座运行',
+		});
+		return;
+	}
+	var  appid = plus.runtime.appid;
+	if(!appid){
+		console.error('appid 获取失败');
+		return;
+	}
+	robot.init(appid, (msg) => {
 		if (msg != 'fail') {
 			return; //good
 		}
