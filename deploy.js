@@ -129,6 +129,8 @@ function uploadPack(wgtpath, donecall) {
             console.log(error);
             console.log(body);
             console.log('\u001b[31m[失败]\u001b[0m 热更新出现错误！！！\n');
+			console.log('去QQ群沟通吧: 862460452 \n');
+			return; //终止
         } else {
             console.log(body);
             // console.log(' \u001b[32m  [已上传到热更新服务器]!!\u001b[0m ');

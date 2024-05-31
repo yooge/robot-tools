@@ -114,6 +114,8 @@ robot-tools deploy apk=false  //不生成apk
 * 3. 制作热补丁并上传
 
 #### 3.2 自定义热更新服务器
+
+打包发布时执行：
 ```js 
 robot-tools deploy apk=false server=default
 robot-tools deploy apk=false server=http://abc.com/
@@ -122,19 +124,51 @@ robot-tools deploy apk=false server=http://abc.com/
 wgt文件就会存到你的服务器上
 然后在代码中使用  version.install(callback, url_wgt);
 
-## 4. 热更新
+## 4. 热更新 （从客户端升级app）
+
 ### 4.1 直接升级
 ```js
 //1. 直接升级
-require('robot-tools').version.checkThenInstall();
+const {version} = require('robot-tools');
+
+ //如果你的包，存到了自定义服务器上，则设置如下，（如果没有请忽略）
+ version.server = "http://abc.com/";
+
+ //运行远程的APP版本(直接从网络上运行)
+ version.run({
+	 show: true,  //是否显示加载对话框
+	 title: "启动中..",     //对话框的标题
+	 appid : "__appid__",  //1.直接安装app。如果不指定，则默认是自己
+	 wgt: "http://",      //2.从指定的路径安装指定的app
+	 version_code: "仅最新版本", //安装指定的版本
+ })
+
+ //简单的升级
+ version.checkThenInstall(); //检查版本，并安装， 有等待窗口
+ version.install(()=>{}); //功能同上, 无弹窗提示
+ version.install(()=>{}, wgt_url); //功能同上, 安装指定远程的 项目/热更新
+ version.install(()=>{}, appid); //功能同上, 安装指定远程的 项目/热更新
+ 
+ //安装远程版本
+ version.upgrade({
+	 show: true,  //是否显示对话框
+	 title: "下载更新中..",     //对话框的标题
+	 appid : "__appid__",  //1.直接安装app。如果不指定，则默认是自己
+	 wgt: "http://",      //2.从指定的路径安装指定的app
+	 version_code: "仅最新版本", //安装指定的版本 
+ });
 ```
-### 4.2 检查，然后升级
+`参数 appid, wgt 如果不指定，则是指自己的最近的热更新版本`
+
+
+### 4.2 举例：检查然后升级
 ```js
 const {version} = require('robot-tools');
 
- uni.showLoading({
+uni.showLoading({
        title: '加载中...'
-  });
+});
+
 version.checkVersion((res) => {
 	console.log('current version: ' + version.name);
 	console.log('remote version: ' + res.version);
@@ -142,14 +176,13 @@ version.checkVersion((res) => {
 		// plus.nativeUI.confirm("是否安装更新？", function(e){
 		// 	console.log("Close confirm: "+e.index);
 		// });
-		version.install(res.download, (status) => {
+		//console.log(res.download); //需要安装的url
+		version.install((status) => {
 			//
 			//
 		});
 	} else {
-		if (loadingText) {
-			uni.hideLoading();
-		}
+		uni.hideLoading();
 	}
 });
 	

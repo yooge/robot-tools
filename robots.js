@@ -105,17 +105,21 @@ ROBOT.init = function(obj) {
 		});
 		return that;
 	});
-	
+
 	return true;
 }
-ROBOT.start = function(params) {
+//wait  不立即执行
+ROBOT.start = function(params, wait) {
 	if (params != undefined) {
-		if(!this.init(params)){
+		if (!this.init(params)) {
 			return false;
 		}
 	}
 	this.menu.show();
-	this.robot.start();
+	if (!wait) {
+		this.robot.start();
+	}
+	return true;
 }
 ROBOT.menu = {};
 ROBOT.menu.move = function(x, y) {
@@ -157,7 +161,7 @@ ROBOT.menu.state = function(state) {
 }
 
 ROBOT.showMenu = function(obj) {
-	if(!this.init(obj)){
+	if (!this.init(obj)) {
 		return false;
 	}
 	this.menu.show();

@@ -1,30 +1,17 @@
+//安装远程WGT
 function installZipUrl(zipurl, callback) {
-
-	//var downURL="file:///storage/emulated/0/wz/";
-	var dtask = plus.downloader.createDownload(zipurl, {}, function(d, status) {
-		//下载完成
-		//alert("bb");
-		//console.log(d);
-		if (status == 200) {
-			//alert("Download success:" + d.filename);
-			//queryFiles();
-			//console.log('200');
-			install(d.filename, callback);
-		} else {
-			console.log("Downlaod failed:" + status);
-		}
-	}, function(e) {
-		console.log(e.Message);
-	});
-	// dtask.addEventListener('statechanged',function(d,status){  
-
-	//     console.log("statechanged: "+d.state);  
-
-	// });  
-	dtask.start();
-
+	downloadZipUrl(zipurl, (info)=>{
+		install(info.filename, callback);
+	}) 
 }
-
+//直接运行WGT
+function runWgtUrl(wgturl, callback) {
+	downloadZipUrl(wgturl, (info)=>{
+		 //runnnnn ->
+		 console.log("TODOOOO--> 运行wgt");
+		 callback();;
+	}) 
+}
 //安装
 function install(wgt, callback) {
 	console.log('start install!!!');
@@ -40,6 +27,35 @@ function install(wgt, callback) {
 		callback('err');
 	});
 }
+
+function downloadZipUrl(zipurl, callback) {
+
+	//var downURL="file:///storage/emulated/0/wz/";
+	var dtask = plus.downloader.createDownload(zipurl, {}, function(info, status) {
+		//下载完成
+		//alert("bb");
+		//console.log(d);
+		if (status == 200) {
+			//alert("Download success:" + d.filename);
+			//queryFiles();
+			//console.log('200');
+			//install(d.filename, callback);
+			callback(info);
+		} else {
+			console.log("Downlaod failed:" + status);
+		}
+	}, function(e) {
+		console.log(e.Message);
+	});
+	// dtask.addEventListener('statechanged',function(d,status){  
+
+	//     console.log("statechanged: "+d.state);  
+
+	// });  
+	dtask.start();
+
+}
+
 //然后通过queryFile是进行_downlaods文件的遍历找到没有解压的zip文件
 /*
 	function queryFiles() {

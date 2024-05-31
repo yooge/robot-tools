@@ -1,9 +1,78 @@
 // 全量安装
 var utils = require('./install.utils.js');
-const version_manager_install = "http://rpa.shen-x.com/app-store/install.php?";
+const version_manager_install = "http://rpa.shen-x.com/";
+///http://rpa.shen-x.com/app-store/install.php?app=--appid--
+var serverURL = '';
 var download_url = '';
 var download_ver = '';
 var curVersion = "";
+var VERINFO = {
+	appid: "",
+	run: false
+}
+
+//直接运行
+function run(param) {
+   param.run = true;
+   upgrade(param);
+}
+/*
+{
+	show: true,
+    title: "下载测试",
+	appid : "__appid_"
+	wgt: "http://",
+	version_code: "不支持"
+	run: false //是否立即运行，而不是安装
+}
+*/
+function upgrade(param) {
+	// #ifndef APP-PLUS
+	return; //非手机环境
+	// #endif 
+	var dialog_hide = ()=>{};
+	if (param.show) {
+		var loadingText = param.title;
+		if (!loadingText) {
+			loadingText = '加载中...';
+		}
+		if (loadingText) {
+			uni.showLoading({
+				title: loadingText
+			});
+		}
+		dialog_hide = ()=>{
+			uni.hideLoading();
+		}
+	} 
+	
+	//安装指定的appid
+	VERINFO.appid = param.appid;
+	
+	//安装指定的wgt地址
+    if(param.wgt){
+		installViaUrl(param.wgt, (status) => {
+			dialog_hide();
+		});
+		return;
+	}
+	
+	checkVersion((res) => {
+		console.log('current version: ' + project.manifest.version.name);
+		console.log('remote version: ' + res.version);
+		if (project.manifest.version.name != res.version) { //准备更新
+			// plus.nativeUI.confirm("是否安装更新？", function(e){
+			// 	console.log("Close confirm: "+e.index);
+			// });
+			installViaUrl(res.download, (status) => {
+				dialog_hide();
+			});
+		} else {
+			dialog_hide();
+		}
+	});
+
+}
 //检查直接安装
 function checkThenInstall(loadingText) {
 	// #ifndef APP-PLUS
@@ -15,7 +84,7 @@ function checkThenInstall(loadingText) {
 	}
 	if (loadingText) {
 		uni.showLoading({
-			title: '加载中...'
+			title: loadingText
 		});
 	}
 
@@ -50,6 +119,9 @@ function checkVersion(callback) {
 		return;
 	}
 	var channel = project.manifest.appid; //实际安装的appid
+	if(VERINFO.appid){
+		channel = VERINFO.appid;
+	}
 	return checkInfo(channel, (res) => {
 		//console.log(res);
 		if (res.err != undefined) {
@@ -64,20 +136,23 @@ function checkVersion(callback) {
 	});
 }
 
-//直接安装
+
+
+//直接安装, //[url]有可能是空
 function install(callback, url) {
 	// #ifndef APP-PLUS
 	return; //非手机环境
 	// #endif
 	return installViaUrl(url, callback);
 }
-//直接安装URL
+//直接安装URL,  url有可能是空
 function installViaUrl(download_url, callback) {
 	if (download_url) {
 		do_install(download_url, callback);
 		return;
 	}
 
+	//如果url为空
 	checkVersion(function(res) {
 		console.log('remote version: ' + res.version);
 		download_url = res.download;
@@ -109,8 +184,12 @@ function do_install(download_url, callback) {
 
 function checkInfo(channel, callback) {
 
-	var url = version_manager_install + "app=" + channel;;
-	//console.log(url);
+	var server = version_manager_install;
+	if(serverURL){
+		server = serverURL
+	}
+	var url = server + "/app-store/install.php?app=" + channel;;
+	
 	uni.request({
 		url: url,
 		type: 'GET',
@@ -156,9 +235,12 @@ function prepare() {
 		project.manifest = (JSON.parse(res));
 		project.appid = project.manifest.appid = project.manifest.id;
 		project.version_name = project.manifest.version.name;
+		project.version_code = project.manifest.version.code;
 
-		if (prepare.onReadyCaller) prepare.onReadyCaller();
-		prepare._readyDone  = true;
+		if (prepare.onReadyCaller) {
+			prepare.onReadyCaller();
+		}
+		prepare._readyDone = true;
 	});;
 }
 prepare.onReadyCaller = null;
@@ -187,7 +269,8 @@ module.exports = {
 	checkThenInstall,
 	manifest,
 	isDebug,
-	project
+	project,
+	server: serverURL
 
 }
 // module.exports.prototype.appid = function(){
@@ -197,7 +280,7 @@ module.exports = {
 Object.defineProperty(module.exports, 'onReady', {
 	set(callback) {
 		prepare.onReadyCaller = callback;
-		if(prepare._readyDone ){ //如果已经过期了，则直接运行
+		if (prepare._readyDone) { //如果已经过期了，则直接运行
 			return callback();
 		}
 	}
@@ -216,8 +299,9 @@ Object.defineProperty(module.exports, 'name', {
 	get() {
 		return project.manifest.version.name;
 	},
-	// set(newValue) {
-	//     console.log('设置')
-	//     value = newValue
-	// }
+});
+Object.defineProperty(module.exports, 'code', {
+	get() {
+		return project.manifest.version.code;
+	},
 });
